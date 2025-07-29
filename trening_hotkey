@@ -1,1 +1,568 @@
-
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр горячих клавиш</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #000;
+            color: #fff;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #bb86fc;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .shortcuts-list {
+            flex: 1;
+            min-width: 300px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(187, 134, 252, 0.2);
+        }
+        
+        .training-area {
+            flex: 2;
+            min-width: 400px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(187, 134, 252, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .shortcut-item {
+            padding: 12px;
+            margin: 8px 0;
+            background-color: #2d2d2d;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border-left: 3px solid #bb86fc;
+        }
+        
+        .shortcut-item:hover {
+            background-color: #383838;
+        }
+        
+        .shortcut-key {
+            background-color: #ffeb3b;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .action-text {
+            font-weight: 500;
+            color: #fff;
+        }
+        
+        .task-display {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+            border: 1px solid #bb86fc;
+        }
+        
+        .current-task {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ffeb3b;
+        }
+        
+        .hint {
+            font-size: 14px;
+            color: #bb86fc;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .key-press-display {
+            margin-top: 20px;
+            font-size: 24px;
+            min-height: 40px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #bb86fc;
+            text-transform: uppercase;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #383838;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #bb86fc;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .keyboard-key {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 2px;
+            background-color: #2d2d2d;
+            color: #fff;
+            border-radius: 4px;
+            border: 1px solid #bb86fc;
+            font-family: monospace;
+            font-size: 14px;
+            box-shadow: 0 2px 0 #bb86fc;
+        }
+        
+        .keyboard-key.active {
+            background-color: #ffeb3b;
+            color: #000;
+            transform: translateY(2px);
+            box-shadow: 0 0 0 #bb86fc;
+        }
+        
+        .keyboard-visual {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .keyboard-row {
+            margin-bottom: 5px;
+        }
+        
+        .success-message {
+            color: #4CAF50;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            height: 20px;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            height: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #bb86fc;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #ffeb3b;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тренажёр горячих клавиш для работы с текстом и файлами</h1>
+    
+    <div class="container">
+        <div class="shortcuts-list">
+            <h2 style="color: #ffeb3b;">Основные комбинации</h2>
+            <div class="shortcut-item">
+                <span class="action-text">Копировать</span>
+                <span class="shortcut-key">Ctrl + C</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Вырезать</span>
+                <span class="shortcut-key">Ctrl + X</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Вставить</span>
+                <span class="shortcut-key">Ctrl + V</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Отменить</span>
+                <span class="shortcut-key">Ctrl + Z</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Повторить</span>
+                <span class="shortcut-key">Ctrl + Y</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Сохранить</span>
+                <span class="shortcut-key">Ctrl + S</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Найти</span>
+                <span class="shortcut-key">Ctrl + F</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Выделить всё</span>
+                <span class="shortcut-key">Ctrl + A</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Новый файл</span>
+                <span class="shortcut-key">Ctrl + N</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Печать</span>
+                <span class="shortcut-key">Ctrl + P</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Открыть</span>
+                <span class="shortcut-key">Ctrl + O</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Жирный текст</span>
+                <span class="shortcut-key">Ctrl + B</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Курсив</span>
+                <span class="shortcut-key">Ctrl + I</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="action-text">Подчёркивание</span>
+                <span class="shortcut-key">Ctrl + U</span>
+            </div>
+        </div>
+        
+        <div class="training-area">
+            <h2 style="color: #ffeb3b;">Тренировка</h2>
+            <div class="task-display">
+                <div class="current-task" id="current-task">Нажмите "Начать", чтобы начать тренировку</div>
+                <div class="hint" id="hint">Используйте клавиатуру для ввода комбинаций</div>
+                <div class="key-press-display" id="key-press-display"></div>
+            </div>
+            
+            <div class="keyboard-visual">
+                <div class="keyboard-row">
+                    <span class="keyboard-key" id="key-ctrl">Ctrl</span>
+                    <span class="keyboard-key" id="key-shift">Shift</span>
+                    <span class="keyboard-key" id="key-alt">Alt</span>
+                </div>
+                <div class="keyboard-row">
+                    <span class="keyboard-key" id="key-c">C</span>
+                    <span class="keyboard-key" id="key-x">X</span>
+                    <span class="keyboard-key" id="key-v">V</span>
+                    <span class="keyboard-key" id="key-z">Z</span>
+                    <span class="keyboard-key" id="key-y">Y</span>
+                    <span class="keyboard-key" id="key-a">A</span>
+                    <span class="keyboard-key" id="key-s">S</span>
+                    <span class="keyboard-key" id="key-f">F</span>
+                    <span class="keyboard-key" id="key-n">N</span>
+                    <span class="keyboard-key" id="key-o">O</span>
+                    <span class="keyboard-key" id="key-p">P</span>
+                    <span class="keyboard-key" id="key-b">B</span>
+                    <span class="keyboard-key" id="key-i">I</span>
+                    <span class="keyboard-key" id="key-u">U</span>
+                </div>
+            </div>
+            
+            <div class="success-message" id="success-message"></div>
+            <div class="error-message" id="error-message"></div>
+            
+            <button id="start-btn">Начать тренировку</button>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="correct-count">0</div>
+                    <div class="stat-label">Правильно</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="wrong-count">0</div>
+                    <div class="stat-label">Ошибки</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="score">0%</div>
+                    <div class="stat-label">Точность</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы интерфейса
+            const startBtn = document.getElementById('start-btn');
+            const currentTask = document.getElementById('current-task');
+            const hint = document.getElementById('hint');
+            const keyPressDisplay = document.getElementById('key-press-display');
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // Статистика
+            const correctCount = document.getElementById('correct-count');
+            const wrongCount = document.getElementById('wrong-count');
+            const score = document.getElementById('score');
+            
+            // Клавиши на виртуальной клавиатуре
+            const keyboardKeys = {
+                'ctrl': document.getElementById('key-ctrl'),
+                'shift': document.getElementById('key-shift'),
+                'alt': document.getElementById('key-alt'),
+                'c': document.getElementById('key-c'),
+                'x': document.getElementById('key-x'),
+                'v': document.getElementById('key-v'),
+                'z': document.getElementById('key-z'),
+                'y': document.getElementById('key-y'),
+                'a': document.getElementById('key-a'),
+                's': document.getElementById('key-s'),
+                'f': document.getElementById('key-f'),
+                'n': document.getElementById('key-n'),
+                'o': document.getElementById('key-o'),
+                'p': document.getElementById('key-p'),
+                'b': document.getElementById('key-b'),
+                'i': document.getElementById('key-i'),
+                'u': document.getElementById('key-u')
+            };
+            
+            // Список всех комбинаций для тренировки
+            const allShortcuts = [
+                { action: 'Копировать', keys: ['Control', 'c'], display: 'Ctrl + C' },
+                { action: 'Вырезать', keys: ['Control', 'x'], display: 'Ctrl + X' },
+                { action: 'Вставить', keys: ['Control', 'v'], display: 'Ctrl + V' },
+                { action: 'Отменить', keys: ['Control', 'z'], display: 'Ctrl + Z' },
+                { action: 'Повторить', keys: ['Control', 'y'], display: 'Ctrl + Y' },
+                { action: 'Сохранить', keys: ['Control', 's'], display: 'Ctrl + S' },
+                { action: 'Найти', keys: ['Control', 'f'], display: 'Ctrl + F' },
+                { action: 'Выделить всё', keys: ['Control', 'a'], display: 'Ctrl + A' },
+                { action: 'Новый файл', keys: ['Control', 'n'], display: 'Ctrl + N' },
+                { action: 'Печать', keys: ['Control', 'p'], display: 'Ctrl + P' },
+                { action: 'Открыть', keys: ['Control', 'o'], display: 'Ctrl + O' },
+                { action: 'Жирный текст', keys: ['Control', 'b'], display: 'Ctrl + B' },
+                { action: 'Курсив', keys: ['Control', 'i'], display: 'Ctrl + I' },
+                { action: 'Подчёркивание', keys: ['Control', 'u'], display: 'Ctrl + U' }
+            ];
+            
+            // Состояние тренировки
+            let isTraining = false;
+            let currentShortcut = null;
+            let pressedKeys = new Set();
+            let correctAnswers = 0;
+            let wrongAnswers = 0;
+            let totalAttempts = 0;
+            
+            // Начать тренировку
+            startBtn.addEventListener('click', function() {
+                isTraining = true;
+                correctAnswers = 0;
+                wrongAnswers = 0;
+                totalAttempts = 0;
+                updateStats();
+                startBtn.textContent = 'Перезапустить';
+                nextTask();
+            });
+            
+            // Генерация нового задания
+            function nextTask() {
+                // Выбираем случайную комбинацию
+                currentShortcut = allShortcuts[Math.floor(Math.random() * allShortcuts.length)];
+                currentTask.textContent = `Выполните: ${currentShortcut.action}`;
+                hint.textContent = `Комбинация: ${currentShortcut.display}`;
+                keyPressDisplay.textContent = '';
+                successMessage.textContent = '';
+                errorMessage.textContent = '';
+                pressedKeys.clear();
+                
+                // Сбрасываем подсветку клавиш
+                Object.values(keyboardKeys).forEach(key => key.classList.remove('active'));
+            }
+            
+            // Обработка нажатий клавиш
+            document.addEventListener('keydown', function(e) {
+                if (!isTraining) return;
+                
+                // Игнорируем повторные нажатия
+                if (e.repeat) return;
+                
+                // Предотвращаем действие по умолчанию для всех обрабатываемых клавиш
+                const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+                const isTrainingKey = [
+                    'Control', 'c', 'x', 'v', 'z', 'y', 'a', 's', 'f', 'n', 'o', 'p', 'b', 'i', 'u'
+                ].includes(key);
+                
+                if (isTrainingKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                }
+                
+                pressedKeys.add(key);
+                
+                // Подсвечиваем клавишу на виртуальной клавиатуре
+                if (keyboardKeys[key.toLowerCase()]) {
+                    keyboardKeys[key.toLowerCase()].classList.add('active');
+                } else if (key === 'Control' && keyboardKeys['ctrl']) {
+                    keyboardKeys['ctrl'].classList.add('active');
+                }
+                
+                updateKeyPressDisplay();
+                
+                // Проверяем комбинацию
+                checkShortcut();
+            }, true); // Используем capture phase для перехвата событий
+            
+            document.addEventListener('keyup', function(e) {
+                if (!isTraining) return;
+                
+                const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+                pressedKeys.delete(key);
+                
+                // Снимаем подсветку с клавиши
+                if (keyboardKeys[key.toLowerCase()]) {
+                    keyboardKeys[key.toLowerCase()].classList.remove('active');
+                } else if (key === 'Control' && keyboardKeys['ctrl']) {
+                    keyboardKeys['ctrl'].classList.remove('active');
+                }
+            }, true);
+            
+            // Обновление отображения нажатых клавиш
+            function updateKeyPressDisplay() {
+                const keysArray = Array.from(pressedKeys);
+                const displayKeys = keysArray.map(k => {
+                    if (k === 'Control') return 'Ctrl';
+                    if (k === ' ') return 'Space';
+                    return k.length === 1 ? k.toUpperCase() : k;
+                });
+                
+                keyPressDisplay.textContent = displayKeys.join(' + ');
+            }
+            
+            // Проверка правильности комбинации
+            function checkShortcut() {
+                if (!currentShortcut) return;
+                
+                const pressedArray = Array.from(pressedKeys);
+                const expectedKeys = currentShortcut.keys.map(k => k.toLowerCase());
+                const pressedNormalized = pressedArray.map(k => k.toLowerCase());
+                
+                // Проверяем, что все нужные клавиши нажаты
+                const allExpectedPressed = expectedKeys.every(k => 
+                    pressedNormalized.includes(k.toLowerCase())
+                );
+                
+                // Проверяем, что не нажато лишних клавиш
+                const noExtraKeys = pressedNormalized.every(k => 
+                    expectedKeys.includes(k.toLowerCase())
+                );
+                
+                if (allExpectedPressed && noExtraKeys) {
+                    // Правильная комбинация
+                    successMessage.textContent = '✓ Верно!';
+                    errorMessage.textContent = '';
+                    correctAnswers++;
+                    totalAttempts++;
+                    updateStats();
+                    
+                    // Задержка перед следующим заданием
+                    setTimeout(() => {
+                        if (isTraining) nextTask();
+                    }, 1000);
+                } else if (pressedArray.length >= expectedKeys.length) {
+                    // Неправильная комбинация
+                    errorMessage.textContent = '✗ Неверно, попробуйте ещё';
+                    wrongAnswers++;
+                    totalAttempts++;
+                    updateStats();
+                }
+            }
+            
+            // Обновление статистики
+            function updateStats() {
+                correctCount.textContent = correctAnswers;
+                wrongCount.textContent = wrongAnswers;
+                
+                const accuracy = totalAttempts > 0 ? 
+                    Math.round((correctAnswers / totalAttempts) * 100) : 0;
+                score.textContent = `${accuracy}%`;
+                
+                // Обновление прогресс-бара
+                const totalTasks = correctAnswers + wrongAnswers;
+                const progress = totalTasks > 0 ? (correctAnswers / (allShortcuts.length * 2)) * 100 : 0;
+                progressBar.style.width = `${Math.min(progress, 100)}%`;
+            }
+            
+            // Блокировка стандартных действий браузера
+            const blockedShortcuts = [
+                'Control+c', 'Control+x', 'Control+v', 'Control+z', 'Control+y',
+                'Control+a', 'Control+s', 'Control+f', 'Control+n', 'Control+o',
+                'Control+p', 'Control+b', 'Control+i', 'Control+u'
+            ];
+            
+            document.addEventListener('keydown', function(e) {
+                if (!isTraining) return;
+                
+                const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+                const shortcut = (e.ctrlKey ? 'Control+' : '') + key;
+                
+                if (blockedShortcuts.includes(shortcut)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+            }, true);
+        });
+    </script>
+</body>
+</html>
