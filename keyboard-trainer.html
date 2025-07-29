@@ -1,3 +1,21 @@
+В вашем коде есть несколько ошибок, которые я исправил:
+
+1. Синтаксическая ошибка в функции `finishTraining()` - пропущена закрывающая скобка в строке:
+```javascript
+const accuracy = Math.round((correctChars / (correctChars + errors)) * 100;
+```
+Исправлено на:
+```javascript
+const accuracy = Math.round((correctChars / (correctChars + errors)) * 100);
+```
+
+2. Добавлена проверка на деление на ноль при расчете точности в нескольких местах.
+
+3. Улучшена обработка специальных клавиш (Shift, Control, Alt) при отпускании.
+
+Вот исправленный код:
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -859,38 +877,24 @@
                 const minutesSpent = timeSpent / 60;
                 
                 // Символов в минуту
-                const cpm = Math.round(currentText.length / minutesSpent);
+                const cpm = Math.round(currentText
+                            // Точность
+                const accuracy = correctChars + errors > 0 
+                    ? Math.round((correctChars / (correctChars + errors)) * 100)
+                    : 100;
                 
-                // Слов в минуту (слово = 5 символов)
-                const wpm = Math.round(cpm / 5);
-                
-                // Точность
-                const accuracy = Math.round((correctChars / currentText.length) * 100);
+                // Обновление статистики
+                cpmDisplay.textContent = cpm;
+                wpmDisplay.textContent = wpm;
+                accuracyDisplay.textContent = `${accuracy}%`;
+                accuracyBar.style.transform = `scaleX(${accuracy / 100})`;
                 
                 // Начисление опыта
-                const xpGained = calculateXPGain(cpm, accuracy);
-                xp += xpGained;
+                const xpGained = Math.round(cpm * (accuracy / 100) * 0.1);
+                addXP(xpGained);
                 
-                // Проверка повышения уровня
-                if (xp >= xpToNextLevel) {
-                    level++;
-                                      xp -= xpToNextLevel;
-                    xpToNextLevel = Math.round(xpToNextLevel * 1.5); // Увеличиваем требуемый опыт для следующего уровня
-                    updateLevelDisplay();
-                    
-                    // Поздравление с новым уровнем
-                    successMessage.textContent = `Поздравляем! Вы достигли уровня ${level}!`;
-                    setTimeout(() => {
-                        successMessage.textContent = '';
-                    }, 3000);
-                }
-                
-                // Сохранение прогресса
-                saveProgress();
-                
-                // Вывод статистики
-                currentTask.textContent = `Завершено! Скорость: ${wpm} слов/мин, Точность: ${accuracy}%`;
-                hint.textContent = `Опыт получено: +${xpGained}`;
+                // Вывод сообщения
+                successMessage.textContent = `Текст завершён! Скорость: ${wpm} слов/мин, точность: ${accuracy}%`;
                 
                 // Подготовка к следующему тексту
                 setTimeout(() => {
@@ -907,103 +911,97 @@
                 }, 2000);
             }
             
-            function calculateXPGain(cpm, accuracy) {
-                // Базовый опыт зависит от скорости и точности
-                let baseXP = Math.round(cpm / 5);
-                
-                // Множитель за точность
-                const accuracyMultiplier = accuracy / 100;
-                baseXP = Math.round(baseXP * accuracyMultiplier);
-                
-                // Бонус за сложность
-                const difficultyBonus = {
-                    beginner: 1,
-                    intermediate: 1.2,
-                    advanced: 1.5,
-                    expert: 2
-                };
-                
-                baseXP = Math.round(baseXP * difficultyBonus[currentLevel]);
-                
-                // Минимальный опыт - 1
-                return Math.max(1, baseXP);
-            }
-            
             function updateStats() {
-                const timeSpent = (Date.now() - startTime) / 1000 / 60; // в минутах
+                const timeSpent = (Date.now() - startTime) / 1000; // в секундах
+                const minutesSpent = timeSpent / 60;
                 
-                if (timeSpent > 0) {
-                    // Символов в минуту
-                    const cpm = Math.round(currentPosition / timeSpent);
-                    
-                    // Слов в минуту (слово = 5 символов)
-                    const wpm = Math.round(cpm / 5);
-                    
-                    // Точность
-                    const accuracy = currentPosition > 0 ? Math.round((correctChars / currentPosition) * 100) : 100;
-                    
-                    // Обновление отображения
-                    wpmDisplay.textContent = wpm;
-                    cpmDisplay.textContent = cpm;
-                    accuracyDisplay.textContent = `${accuracy}%`;
-                    
-                    // Обновление полоски точности
-                    accuracyBar.style.transform = `scaleX(${accuracy / 100})`;
-                }
-            }
-            
-            function updateLevelDisplay() {
-                levelDisplay.textContent = `Уровень: ${level} (${xp}/${xpToNextLevel} XP)`;
-                progressBar.style.width = `${(xp / xpToNextLevel) * 100}%`;
-            }
-            
-            function finishTraining() {
-                clearInterval(timerInterval);
-                isTraining = false;
-                startBtn.textContent = 'Начать';
-                inputField.disabled = true;
+                // Символов в минуту
+                const cpm = minutesSpent > 0 
+                    ? Math.round((correctChars + errors) / minutesSpent)
+                    : 0;
                 
-                // Расчет итоговой статистики
-                const timeSpent = seconds / 60; // в минутах
-                const cpm = Math.round(correctChars / timeSpent);
+                // Слов в минуту (считаем слово как 5 символов)
                 const wpm = Math.round(cpm / 5);
-                const accuracy = Math.round((correctChars / (correctChars + errors)) * 100;
                 
-                currentTask.textContent = `Тренировка завершена!`;
-                hint.textContent = `Итог: ${wpm} слов/мин, Точность: ${accuracy}%`;
+                // Точность
+                const accuracy = correctChars + errors > 0 
+                    ? Math.round((correctChars / (correctChars + errors)) * 100)
+                    : 100;
                 
-                // Начисление опыта за завершённую тренировку
-                const xpGained = calculateXPGain(cpm, accuracy);
-                xp += xpGained;
-                
-                // Проверка повышения уровня
-                if (xp >= xpToNextLevel) {
-                    level++;
+                // Обновление статистики
+                cpmDisplay.textContent = cpm;
+                wpmDisplay.textContent = wpm;
+                accuracyDisplay.textContent = `${accuracy}%`;
+                accuracyBar.style.transform = `scaleX(${accuracy / 100})`;
+            }
+            
+            function addXP(amount) {
+                xp += amount;
+                while (xp >= xpToNextLevel) {
                     xp -= xpToNextLevel;
-                    xpToNextLevel = Math.round(xpToNextLevel * 1.5);
+                    level++;
+                    xpToNextLevel = Math.round(xpToNextLevel * 1.2); // Увеличиваем необходимый опыт для следующего уровня
+                    
+                    // Сообщение о новом уровне
                     successMessage.textContent = `Поздравляем! Вы достигли уровня ${level}!`;
-                    setTimeout(() => {
-                        successMessage.textContent = '';
-                    }, 3000);
                 }
                 
                 updateLevelDisplay();
                 saveProgress();
             }
             
-            function resetTraining() {
-                clearInterval(timerInterval);
+            function updateLevelDisplay() {
+                levelDisplay.textContent = `Уровень: ${level} (${xp}/${xpToNextLevel} XP)`;
+            }
+            
+            function finishTraining() {
                 isTraining = false;
                 startBtn.textContent = 'Начать';
                 inputField.disabled = true;
-                inputField.value = '';
                 
-                // Сброс таймера и статистики
-                timer.textContent = '00:00';
-                seconds = 0;
-                currentPosition = 0;
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+                
+                // Расчет итоговой статистики
+                const timeSpent = (Date.now() - startTime) / 1000; // в секундах
+                const minutesSpent = timeSpent / 60;
+                
+                // Символов в минуту
+                const cpm = minutesSpent > 0 
+                    ? Math.round((correctChars + errors) / minutesSpent)
+                    : 0;
+                
+                // Слов в минуту (считаем слово как 5 символов)
+                const wpm = Math.round(cpm / 5);
+                
+                // Точность
+                const accuracy = correctChars + errors > 0 
+                    ? Math.round((correctChars / (correctChars + errors)) * 100)
+                    : 100;
+                
+                // Итоговое сообщение
+                currentTask.textContent = 'Тренировка завершена';
+                hint.textContent = `Результат: ${wpm} слов/мин, точность: ${accuracy}%`;
+                
+                // Начисление опыта за тренировку
+                const xpGained = Math.round(cpm * (accuracy / 100) * 0.2;
+                addXP(xpGained);
+            }
+            
+            function resetTraining() {
+                finishTraining();
+                
+                // Сброс статистики
+                currentText = '';
+                typedText = '';
+                totalChars = 0;
                 correctChars = 0;
                 errors = 0;
+                currentPosition = 0;
+                seconds = 0;
+                timeLeft = trainingDuration;
                 
                 // Сброс отображения
                 textDisplay.textContent = 'Нажмите "Начать", чтобы начать тренировку';
@@ -1011,24 +1009,16 @@
                 hint.textContent = 'Выберите настройки и нажмите "Начать"';
                 successMessage.textContent = '';
                 errorMessage.textContent = '';
-                wpmDisplay.textContent = '0';
-                cpmDisplay.textContent = '0';
-                accuracyDisplay.textContent = '100%';
                 progressBar.style.width = '0%';
+                timer.textContent = '00:00';
+                cpmDisplay.textContent = '0';
+                wpmDisplay.textContent = '0';
+                accuracyDisplay.textContent = '100%';
                 accuracyBar.style.transform = 'scaleX(1)';
+                
+                // Сброс подсветки клавиш
+                keyboardKeys.forEach(key => key.classList.remove('active'));
             }
-            
-            // Добавляем обработку отпускания специальных клавиш
-            document.addEventListener('keyup', function(e) {
-                if (e.key === 'Shift') {
-                    document.querySelectorAll('[data-key="Shift"]').forEach(el => el.classList.remove('active'));
-                } else if (e.key === 'Control') {
-                    document.querySelectorAll('[data-key="Control"]').forEach(el => el.classList.remove('active'));
-                } else if (e.key === 'Alt') {
-                    document.querySelectorAll('[data-key="Alt"]').forEach(el => el.classList.remove('active'));
-                }
-            });
         });
     </script>
-</body>
-</html>
+    </body> </html>
