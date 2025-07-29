@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тренажёр горячих клавиш</title>
+    <title>Продвинутый тренажёр горячих клавиш</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -215,14 +215,78 @@
         button:hover {
             background-color: #ffeb3b;
         }
+        
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+            background-color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 4px;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .difficulty-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+        }
+        
+        .difficulty-option {
+            padding: 8px 15px;
+            background-color: #383838;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-option.active {
+            background-color: #bb86fc;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .combo-counter {
+            font-size: 14px;
+            color: #ffeb3b;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .time-pressure {
+            height: 5px;
+            background-color: #f44336;
+            width: 0%;
+            margin-top: 5px;
+            border-radius: 3px;
+            transition: width 0.1s;
+        }
+        
+        .layout-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #bb86fc;
+        }
     </style>
 </head>
 <body>
-    <h1>Тренажёр горячих клавиш для работы с текстом и файлами</h1>
+    <h1>Продвинутый тренажёр горячих клавиш</h1>
     
     <div class="container">
         <div class="shortcuts-list">
-            <h2 style="color: #ffeb3b;">Основные комбинации</h2>
+            <h2 style="color: #ffeb3b;">Комбинации</h2>
             <div class="shortcut-item">
                 <span class="action-text">Копировать</span>
                 <span class="shortcut-key">Ctrl + C</span>
@@ -256,16 +320,12 @@
                 <span class="shortcut-key">Ctrl + A</span>
             </div>
             <div class="shortcut-item">
-                <span class="action-text">Новый файл</span>
-                <span class="shortcut-key">Ctrl + N</span>
+                <span class="action-text">Открыть</span>
+                <span class="shortcut-key">Ctrl + O</span>
             </div>
             <div class="shortcut-item">
                 <span class="action-text">Печать</span>
                 <span class="shortcut-key">Ctrl + P</span>
-            </div>
-            <div class="shortcut-item">
-                <span class="action-text">Открыть</span>
-                <span class="shortcut-key">Ctrl + O</span>
             </div>
             <div class="shortcut-item">
                 <span class="action-text">Жирный текст</span>
@@ -283,11 +343,26 @@
         
         <div class="training-area">
             <h2 style="color: #ffeb3b;">Тренировка</h2>
+            
+            <div class="difficulty-controls">
+                <div class="difficulty-option active" data-level="easy">Новичок</div>
+                <div class="difficulty-option" data-level="medium">Опытный</div>
+                <div class="difficulty-option" data-level="hard">Эксперт</div>
+                <div class="difficulty-option" data-level="extreme">Мастер</div>
+            </div>
+            
             <div class="task-display">
                 <div class="current-task" id="current-task">Нажмите "Начать", чтобы начать тренировку</div>
                 <div class="hint" id="hint">Используйте клавиатуру для ввода комбинаций</div>
                 <div class="key-press-display" id="key-press-display"></div>
+                <div class="time-pressure" id="time-pressure"></div>
             </div>
+            
+            <div class="timer-container">
+                <div class="timer" id="timer">00:00</div>
+            </div>
+            
+            <div class="combo-counter" id="combo-counter"></div>
             
             <div class="keyboard-visual">
                 <div class="keyboard-row">
@@ -296,21 +371,24 @@
                     <span class="keyboard-key" id="key-alt">Alt</span>
                 </div>
                 <div class="keyboard-row">
-                    <span class="keyboard-key" id="key-c">C</span>
-                    <span class="keyboard-key" id="key-x">X</span>
-                    <span class="keyboard-key" id="key-v">V</span>
-                    <span class="keyboard-key" id="key-z">Z</span>
-                    <span class="keyboard-key" id="key-y">Y</span>
                     <span class="keyboard-key" id="key-a">A</span>
-                    <span class="keyboard-key" id="key-s">S</span>
+                    <span class="keyboard-key" id="key-b">B</span>
+                    <span class="keyboard-key" id="key-c">C</span>
                     <span class="keyboard-key" id="key-f">F</span>
-                    <span class="keyboard-key" id="key-n">N</span>
+                    <span class="keyboard-key" id="key-i">I</span>
                     <span class="keyboard-key" id="key-o">O</span>
                     <span class="keyboard-key" id="key-p">P</span>
-                    <span class="keyboard-key" id="key-b">B</span>
-                    <span class="keyboard-key" id="key-i">I</span>
+                    <span class="keyboard-key" id="key-s">S</span>
                     <span class="keyboard-key" id="key-u">U</span>
+                    <span class="keyboard-key" id="key-v">V</span>
+                    <span class="keyboard-key" id="key-x">X</span>
+                    <span class="keyboard-key" id="key-y">Y</span>
+                    <span class="keyboard-key" id="key-z">Z</span>
                 </div>
+            </div>
+            
+            <div class="layout-info">
+                Тренажёр работает с любой раскладкой клавиатуры
             </div>
             
             <div class="success-message" id="success-message"></div>
@@ -335,6 +413,10 @@
                     <div class="stat-value" id="score">0%</div>
                     <div class="stat-label">Точность</div>
                 </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="combo">0</div>
+                    <div class="stat-label">Комбо</div>
+                </div>
             </div>
         </div>
     </div>
@@ -349,31 +431,35 @@
             const successMessage = document.getElementById('success-message');
             const errorMessage = document.getElementById('error-message');
             const progressBar = document.getElementById('progress-bar');
+            const timer = document.getElementById('timer');
+            const comboCounter = document.getElementById('combo-counter');
+            const timePressure = document.getElementById('time-pressure');
+            const difficultyOptions = document.querySelectorAll('.difficulty-option');
             
             // Статистика
             const correctCount = document.getElementById('correct-count');
             const wrongCount = document.getElementById('wrong-count');
             const score = document.getElementById('score');
+            const comboStat = document.getElementById('combo');
             
             // Клавиши на виртуальной клавиатуре
             const keyboardKeys = {
                 'ctrl': document.getElementById('key-ctrl'),
                 'shift': document.getElementById('key-shift'),
                 'alt': document.getElementById('key-alt'),
-                'c': document.getElementById('key-c'),
-                'x': document.getElementById('key-x'),
-                'v': document.getElementById('key-v'),
-                'z': document.getElementById('key-z'),
-                'y': document.getElementById('key-y'),
                 'a': document.getElementById('key-a'),
-                's': document.getElementById('key-s'),
+                'b': document.getElementById('key-b'),
+                'c': document.getElementById('key-c'),
                 'f': document.getElementById('key-f'),
-                'n': document.getElementById('key-n'),
+                'i': document.getElementById('key-i'),
                 'o': document.getElementById('key-o'),
                 'p': document.getElementById('key-p'),
-                'b': document.getElementById('key-b'),
-                'i': document.getElementById('key-i'),
-                'u': document.getElementById('key-u')
+                's': document.getElementById('key-s'),
+                'u': document.getElementById('key-u'),
+                'v': document.getElementById('key-v'),
+                'x': document.getElementById('key-x'),
+                'y': document.getElementById('key-y'),
+                'z': document.getElementById('key-z')
             };
             
             // Список всех комбинаций для тренировки
@@ -386,9 +472,8 @@
                 { action: 'Сохранить', keys: ['Control', 's'], display: 'Ctrl + S' },
                 { action: 'Найти', keys: ['Control', 'f'], display: 'Ctrl + F' },
                 { action: 'Выделить всё', keys: ['Control', 'a'], display: 'Ctrl + A' },
-                { action: 'Новый файл', keys: ['Control', 'n'], display: 'Ctrl + N' },
-                { action: 'Печать', keys: ['Control', 'p'], display: 'Ctrl + P' },
                 { action: 'Открыть', keys: ['Control', 'o'], display: 'Ctrl + O' },
+                { action: 'Печать', keys: ['Control', 'p'], display: 'Ctrl + P' },
                 { action: 'Жирный текст', keys: ['Control', 'b'], display: 'Ctrl + B' },
                 { action: 'Курсив', keys: ['Control', 'i'], display: 'Ctrl + I' },
                 { action: 'Подчёркивание', keys: ['Control', 'u'], display: 'Ctrl + U' }
@@ -401,6 +486,15 @@
             let correctAnswers = 0;
             let wrongAnswers = 0;
             let totalAttempts = 0;
+            let timerInterval = null;
+            let seconds = 0;
+            let combo = 0;
+            let maxCombo = 0;
+            let difficulty = 'easy';
+            let timeLimit = 0;
+            let timeLeft = 0;
+            let timePressureInterval = null;
+            let usedShortcuts = [];
             
             // Начать тренировку
             startBtn.addEventListener('click', function() {
@@ -408,21 +502,134 @@
                 correctAnswers = 0;
                 wrongAnswers = 0;
                 totalAttempts = 0;
+                combo = 0;
+                maxCombo = 0;
+                seconds = 0;
+                usedShortcuts = [];
                 updateStats();
                 startBtn.textContent = 'Перезапустить';
+                
+                // Установка времени в зависимости от сложности
+                setTimeLimit();
+                
+                // Запуск таймера
+                if (timerInterval) clearInterval(timerInterval);
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
+                
                 nextTask();
             });
             
-            // Генерация нового задания
+            // Установка уровня сложности
+            difficultyOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    difficultyOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+                    setTimeLimit();
+                });
+            });
+            
+            // Установка лимита времени в зависимости от сложности
+            function setTimeLimit() {
+                switch(difficulty) {
+                    case 'easy':
+                        timeLimit = 0; // Без ограничения времени
+                        break;
+                    case 'medium':
+                        timeLimit = 10; // 10 секунд
+                        break;
+                    case 'hard':
+                        timeLimit = 7; // 7 секунд
+                        break;
+                    case 'extreme':
+                        timeLimit = 5; // 5 секунд
+                        break;
+                }
+                timeLeft = timeLimit;
+                updateTimePressure();
+            }
+            
+            // Обновление таймера
+            function updateTimer() {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timer.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                
+                // Обновление счетчика времени для сложных режимов
+                if (timeLimit > 0 && currentShortcut) {
+                    timeLeft--;
+                    updateTimePressure();
+                    
+                    if (timeLeft <= 0) {
+                        // Время вышло
+                        errorMessage.textContent = 'Время вышло!';
+                        wrongAnswers++;
+                        totalAttempts++;
+                        combo = 0;
+                        updateStats();
+                        
+                        setTimeout(() => {
+                            if (isTraining) nextTask();
+                        }, 1000);
+                    }
+                }
+            }
+            
+            // Обновление индикатора времени
+            function updateTimePressure() {
+                if (timeLimit > 0) {
+                    const percent = (timeLeft / timeLimit) * 100;
+                    timePressure.style.width = `${percent}%`;
+                    
+                    // Изменение цвета в зависимости от оставшегося времени
+                    if (percent < 30) {
+                        timePressure.style.backgroundColor = '#f44336'; // Красный
+                    } else if (percent < 60) {
+                        timePressure.style.backgroundColor = '#ff9800'; // Оранжевый
+                    } else {
+                        timePressure.style.backgroundColor = '#4CAF50'; // Зеленый
+                    }
+                } else {
+                    timePressure.style.width = '0%';
+                }
+            }
+            
+            // Генерация нового задания с учетом сложности
             function nextTask() {
-                // Выбираем случайную комбинацию
-                currentShortcut = allShortcuts[Math.floor(Math.random() * allShortcuts.length)];
+                // Выбираем случайную комбинацию с учетом сложности
+                let availableShortcuts = [...allShortcuts];
+                
+                // На сложных уровнях не повторяем последние 3 комбинации
+                if (difficulty === 'hard' || difficulty === 'extreme') {
+                    availableShortcuts = availableShortcuts.filter(sc => 
+                        !usedShortcuts.slice(-3).includes(sc.action)
+                    );
+                }
+                
+                currentShortcut = availableShortcuts[Math.floor(Math.random() * availableShortcuts.length)];
+                usedShortcuts.push(currentShortcut.action);
+                
                 currentTask.textContent = `Выполните: ${currentShortcut.action}`;
-                hint.textContent = `Комбинация: ${currentShortcut.display}`;
+                
+                // На сложных уровнях скрываем подсказку
+                if (difficulty === 'extreme') {
+                    hint.textContent = 'Подсказка скрыта';
+                } else {
+                    hint.textContent = `Комбинация: ${currentShortcut.display}`;
+                }
+                
                 keyPressDisplay.textContent = '';
                 successMessage.textContent = '';
                 errorMessage.textContent = '';
                 pressedKeys.clear();
+                
+                // Сброс таймера для режимов с ограничением времени
+                if (timeLimit > 0) {
+                    timeLeft = timeLimit;
+                    updateTimePressure();
+                }
                 
                 // Сбрасываем подсветку клавиш
                 Object.values(keyboardKeys).forEach(key => key.classList.remove('active'));
@@ -435,16 +642,13 @@
                 // Игнорируем повторные нажатия
                 if (e.repeat) return;
                 
-                // Предотвращаем действие по умолчанию для всех обрабатываемых клавиш
-                const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-                const isTrainingKey = [
-                    'Control', 'c', 'x', 'v', 'z', 'y', 'a', 's', 'f', 'n', 'o', 'p', 'b', 'i', 'u'
-                ].includes(key);
+                // Получаем физическую клавишу, а не символ
+                const key = getPhysicalKey(e);
                 
-                if (isTrainingKey) {
+                // Блокируем стандартные действия браузера для тренируемых комбинаций
+                if (e.ctrlKey && ['a', 'b', 'c', 'f', 'i', 'o', 'p', 's', 'u', 'v', 'x', 'y', 'z'].includes(key.toLowerCase())) {
                     e.preventDefault();
                     e.stopPropagation();
-                    e.stopImmediatePropagation();
                 }
                 
                 pressedKeys.add(key);
@@ -454,6 +658,10 @@
                     keyboardKeys[key.toLowerCase()].classList.add('active');
                 } else if (key === 'Control' && keyboardKeys['ctrl']) {
                     keyboardKeys['ctrl'].classList.add('active');
+                } else if (key === 'Alt' && keyboardKeys['alt']) {
+                    keyboardKeys['alt'].classList.add('active');
+                } else if (key === 'Shift' && keyboardKeys['shift']) {
+                    keyboardKeys['shift'].classList.add('active');
                 }
                 
                 updateKeyPressDisplay();
@@ -465,7 +673,7 @@
             document.addEventListener('keyup', function(e) {
                 if (!isTraining) return;
                 
-                const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+                const key = getPhysicalKey(e);
                 pressedKeys.delete(key);
                 
                 // Снимаем подсветку с клавиши
@@ -473,8 +681,28 @@
                     keyboardKeys[key.toLowerCase()].classList.remove('active');
                 } else if (key === 'Control' && keyboardKeys['ctrl']) {
                     keyboardKeys['ctrl'].classList.remove('active');
+                } else if (key === 'Alt' && keyboardKeys['alt']) {
+                    keyboardKeys['alt'].classList.remove('active');
+                } else if (key === 'Shift' && keyboardKeys['shift']) {
+                    keyboardKeys['shift'].classList.remove('active');
                 }
             }, true);
+            
+            // Получение физической клавиши (не зависящей от раскладки)
+            function getPhysicalKey(e) {
+                // Для специальных клавиш используем key
+                if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) {
+                    return e.key;
+                }
+                
+                // Для букв используем code, чтобы не зависеть от раскладки
+                if (e.code && e.code.startsWith('Key')) {
+                    return e.code.replace('Key', '');
+                }
+                
+                // Для остальных случаев используем key
+                return e.key;
+            }
             
             // Обновление отображения нажатых клавиш
             function updateKeyPressDisplay() {
@@ -512,25 +740,52 @@
                     errorMessage.textContent = '';
                     correctAnswers++;
                     totalAttempts++;
+                    combo++;
+                    if (combo > maxCombo) maxCombo = combo;
                     updateStats();
+                    
+                    // Обновляем счетчик комбо
+                    updateComboCounter();
                     
                     // Задержка перед следующим заданием
                     setTimeout(() => {
                         if (isTraining) nextTask();
-                    }, 1000);
+                    }, difficulty === 'extreme' ? 500 : 1000);
                 } else if (pressedArray.length >= expectedKeys.length) {
                     // Неправильная комбинация
                     errorMessage.textContent = '✗ Неверно, попробуйте ещё';
                     wrongAnswers++;
                     totalAttempts++;
+                    combo = 0;
                     updateStats();
+                    updateComboCounter();
                 }
+            }
+            
+            // Обновление счетчика комбо
+            function updateComboCounter() {
+                if (combo > 3) {
+                    comboCounter.textContent = `Комбо x${combo}!`;
+                    comboCounter.style.color = getComboColor(combo);
+                } else {
+                    comboCounter.textContent = '';
+                }
+            }
+            
+            // Получение цвета для комбо в зависимости от его длины
+            function getComboColor(combo) {
+                if (combo > 15) return '#ff00ff'; // Фиолетовый
+                if (combo > 10) return '#00ffff'; // Голубой
+                if (combo > 7) return '#ffff00'; // Желтый
+                if (combo > 5) return '#00ff00'; // Зеленый
+                return '#ffeb3b'; // Желтый (по умолчанию)
             }
             
             // Обновление статистики
             function updateStats() {
                 correctCount.textContent = correctAnswers;
                 wrongCount.textContent = wrongAnswers;
+                comboStat.textContent = maxCombo;
                 
                 const accuracy = totalAttempts > 0 ? 
                     Math.round((correctAnswers / totalAttempts) * 100) : 0;
@@ -541,27 +796,6 @@
                 const progress = totalTasks > 0 ? (correctAnswers / (allShortcuts.length * 2)) * 100 : 0;
                 progressBar.style.width = `${Math.min(progress, 100)}%`;
             }
-            
-            // Блокировка стандартных действий браузера
-            const blockedShortcuts = [
-                'Control+c', 'Control+x', 'Control+v', 'Control+z', 'Control+y',
-                'Control+a', 'Control+s', 'Control+f', 'Control+n', 'Control+o',
-                'Control+p', 'Control+b', 'Control+i', 'Control+u'
-            ];
-            
-            document.addEventListener('keydown', function(e) {
-                if (!isTraining) return;
-                
-                const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-                const shortcut = (e.ctrlKey ? 'Control+' : '') + key;
-                
-                if (blockedShortcuts.includes(shortcut)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-            }, true);
         });
     </script>
 </body>
