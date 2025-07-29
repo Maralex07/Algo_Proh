@@ -1,1 +1,1035 @@
-
+html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клавиатурный тренажёр</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #000;
+            color: #fff;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #bb86fc;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .settings-panel {
+            flex: 1;
+            min-width: 250px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(187, 134, 252, 0.2);
+        }
+        
+        .training-area {
+            flex: 2;
+            min-width: 400px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(187, 134, 252, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .task-display {
+            flex-grow: 1;
+            padding: 30px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px;
+            border: 1px solid #bb86fc;
+            font-size: 24px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        
+        .current-task {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffeb3b;
+        }
+        
+        .hint {
+            font-size: 14px;
+            color: #bb86fc;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .input-display {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #2d2d2d;
+            border: 1px solid #bb86fc;
+            border-radius: 6px;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #bb86fc;
+            text-transform: uppercase;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #383838;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #bb86fc;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+            background-color: #2d2d2d;
+            padding: 8px 16px;
+            border-radius: 4px;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .difficulty-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-option {
+            padding: 10px 15px;
+            background-color: #383838;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .difficulty-option.active {
+            background-color: #bb86fc;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .language-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .language-option {
+            flex: 1;
+            padding: 10px;
+            background-color: #383838;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .language-option.active {
+            background-color: #bb86fc;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        button {
+            padding: 12px 24px;
+            margin-top: 20px;
+            background-color: #bb86fc;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #ffeb3b;
+        }
+        
+        .success-message {
+            color: #4CAF50;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            height: 20px;
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            height: 20px;
+        }
+        
+        .keyboard-layout {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        
+        .keyboard-key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            margin: 2px;
+            background-color: #2d2d2d;
+            color: #fff;
+            border-radius: 4px;
+            border: 1px solid #444;
+            font-family: monospace;
+            font-size: 14px;
+            min-width: 30px;
+            height: 40px;
+        }
+        
+        .keyboard-key.active {
+            background-color: #ffeb3b;
+            color: #000;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #bb86fc;
+        }
+        
+        .keyboard-key.space {
+            width: 200px;
+        }
+        
+        .keyboard-key.tab {
+            width: 60px;
+        }
+        
+        .keyboard-key.caps {
+            width: 70px;
+        }
+        
+        .keyboard-key.enter {
+            width: 80px;
+        }
+        
+        .keyboard-key.shift {
+            width: 90px;
+        }
+        
+        .keyboard-key.ctrl, .keyboard-key.alt {
+            width: 60px;
+        }
+        
+        .accuracy-display {
+            width: 100%;
+            height: 5px;
+            background-color: #383838;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .accuracy-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: left;
+            transform: scaleX(1);
+        }
+        
+        .level-display {
+            font-size: 16px;
+            color: #bb86fc;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Клавиатурный тренажёр</h1>
+    
+    <div class="container">
+        <div class="settings-panel">
+            <h2 style="color: #ffeb3b;">Настройки</h2>
+            
+            <div class="difficulty-controls">
+                <h3 style="color: #bb86fc; margin-bottom: 10px;">Уровень сложности</h3>
+                <div class="difficulty-option active" data-level="beginner">Новичок</div>
+                <div class="difficulty-option" data-level="intermediate">Средний</div>
+                <div class="difficulty-option" data-level="advanced">Продвинутый</div>
+                <div class="difficulty-option" data-level="expert">Эксперт</div>
+            </div>
+            
+            <div class="language-controls">
+                <h3 style="color: #bb86fc; margin-bottom: 10px;">Язык</h3>
+                <div class="language-option active" data-lang="ru">Русский</div>
+                <div class="language-option" data-lang="en">Английский</div>
+            </div>
+            
+            <h3 style="color: #bb86fc; margin-bottom: 10px;">Длительность</h3>
+            <select id="duration-select" style="width: 100%; padding: 10px; background: #2d2d2d; color: white; border: 1px solid #bb86fc; border-radius: 4px; margin-bottom: 20px;">
+                <option value="1">1 минута</option>
+                <option value="3">3 минуты</option>
+                <option value="5" selected>5 минут</option>
+                <option value="10">10 минут</option>
+                <option value="0">Без ограничений</option>
+            </select>
+            
+            <button id="start-btn">Начать тренировку</button>
+            <button id="reset-btn" style="margin-top: 10px; background-color: #2d2d2d; color: white;">Сбросить</button>
+            
+            <div class="level-display" id="level-display">Уровень: 1</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+        
+        <div class="training-area">
+            <div class="task-display" id="text-display">
+                Нажмите "Начать", чтобы начать тренировку
+            </div>
+            
+            <input type="text" class="input-display" id="input-field" placeholder="Вводите текст здесь..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" disabled>
+            
+            <div class="current-task" id="current-task">Готов к работе</div>
+            <div class="hint" id="hint">Выберите настройки и нажмите "Начать"</div>
+            
+            <div class="success-message" id="success-message"></div>
+            <div class="error-message" id="error-message"></div>
+            
+            <div class="accuracy-display">
+                <div class="accuracy-bar" id="accuracy-bar"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="wpm">0</div>
+                    <div class="stat-label">Слов/мин</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="cpm">0</div>
+                    <div class="stat-label">Зн./мин</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracy">100%</div>
+                    <div class="stat-label">Точность</div>
+                </div>
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer" id="timer">00:00</div>
+            </div>
+            
+            <div class="keyboard-layout">
+                <div class="keyboard-row">
+                    <div class="keyboard-key" data-key="ё">ё</div>
+                    <div class="keyboard-key" data-key="1">1</div>
+                    <div class="keyboard-key" data-key="2">2</div>
+                    <div class="keyboard-key" data-key="3">3</div>
+                    <div class="keyboard-key" data-key="4">4</div>
+                    <div class="keyboard-key" data-key="5">5</div>
+                    <div class="keyboard-key" data-key="6">6</div>
+                    <div class="keyboard-key" data-key="7">7</div>
+                    <div class="keyboard-key" data-key="8">8</div>
+                    <div class="keyboard-key" data-key="9">9</div>
+                    <div class="keyboard-key" data-key="0">0</div>
+                    <div class="keyboard-key" data-key="-">-</div>
+                    <div class="keyboard-key" data-key="=">=</div>
+                    <div class="keyboard-key" data-key="Backspace" style="width: 80px;">Backspace</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="keyboard-key tab" data-key="Tab">Tab</div>
+                    <div class="keyboard-key" data-key="й">й</div>
+                    <div class="keyboard-key" data-key="ц">ц</div>
+                    <div class="keyboard-key" data-key="у">у</div>
+                    <div class="keyboard-key" data-key="к">к</div>
+                    <div class="keyboard-key" data-key="е">е</div>
+                    <div class="keyboard-key" data-key="н">н</div>
+                    <div class="keyboard-key" data-key="г">г</div>
+                    <div class="keyboard-key" data-key="ш">ш</div>
+                    <div class="keyboard-key" data-key="щ">щ</div>
+                    <div class="keyboard-key" data-key="з">з</div>
+                    <div class="keyboard-key" data-key="х">х</div>
+                    <div class="keyboard-key" data-key="ъ">ъ</div>
+                    <div class="keyboard-key" data-key="\" style="width: 60px;">\</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="keyboard-key caps" data-key="CapsLock">Caps</div>
+                    <div class="keyboard-key" data-key="ф">ф</div>
+                    <div class="keyboard-key" data-key="ы">ы</div>
+                    <div class="keyboard-key" data-key="в">в</div>
+                    <div class="keyboard-key" data-key="а">а</div>
+                    <div class="keyboard-key" data-key="п">п</div>
+                    <div class="keyboard-key" data-key="р">р</div>
+                    <div class="keyboard-key" data-key="о">о</div>
+                    <div class="keyboard-key" data-key="л">л</div>
+                    <div class="keyboard-key" data-key="д">д</div>
+                    <div class="keyboard-key" data-key="ж">ж</div>
+                    <div class="keyboard-key" data-key="э">э</div>
+                    <div class="keyboard-key enter" data-key="Enter">Enter</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="keyboard-key shift" data-key="Shift">Shift</div>
+                    <div class="keyboard-key" data-key="я">я</div>
+                    <div class="keyboard-key" data-key="ч">ч</div>
+                    <div class="keyboard-key" data-key="с">с</div>
+                    <div class="keyboard-key" data-key="м">м</div>
+                    <div class="keyboard-key" data-key="и">и</div>
+                    <div class="keyboard-key" data-key="т">т</div>
+                    <div class="keyboard-key" data-key="ь">ь</div>
+                    <div class="keyboard-key" data-key="б">б</div>
+                    <div class="keyboard-key" data-key="ю">ю</div>
+                    <div class="keyboard-key" data-key=".">.</div>
+                    <div class="keyboard-key shift" data-key="Shift" style="width: 100px;">Shift</div>
+                </div>
+                <div class="keyboard-row">
+                    <div class="keyboard-key ctrl" data-key="Control">Ctrl</div>
+                    <div class="keyboard-key" data-key="Win">Win</div>
+                    <div class="keyboard-key alt" data-key="Alt">Alt</div>
+                    <div class="keyboard-key space" data-key=" ">Space</div>
+                    <div class="keyboard-key alt" data-key="Alt">Alt</div>
+                    <div class="keyboard-key" data-key="Win">Win</div>
+                    <div class="keyboard-key" data-key="ContextMenu">Menu</div>
+                    <div class="keyboard-key ctrl" data-key="Control">Ctrl</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы интерфейса
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const textDisplay = document.getElementById('text-display');
+            const inputField = document.getElementById('input-field');
+            const currentTask = document.getElementById('current-task');
+            const hint = document.getElementById('hint');
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            const progressBar = document.getElementById('progress-bar');
+            const timer = document.getElementById('timer');
+            const levelDisplay = document.getElementById('level-display');
+            const accuracyBar = document.getElementById('accuracy-bar');
+            const durationSelect = document.getElementById('duration-select');
+            
+            // Статистика
+            const wpmDisplay = document.getElementById('wpm');
+            const cpmDisplay = document.getElementById('cpm');
+            const accuracyDisplay = document.getElementById('accuracy');
+            
+            // Кнопки сложности и языка
+            const difficultyOptions = document.querySelectorAll('.difficulty-option');
+            const languageOptions = document.querySelectorAll('.language-option');
+            const keyboardKeys = document.querySelectorAll('.keyboard-key');
+            
+            // Тексты для тренировки
+            const trainingTexts = {
+                ru: {
+                    beginner: [
+                        "Привет, как дела?",
+                        "Сегодня хорошая погода.",
+                        "Я учусь быстро печатать.",
+                        "Этот тренажёр мне помогает.",
+                        "Спасибо за интересную программу."
+                    ],
+                    intermediate: [
+                        "Скорость печати - важный навык в современном мире. Регулярные тренировки помогут вам достичь отличных результатов.",
+                        "Клавиатурный тренажёр разработан для улучшения навыков набора текста. Постепенно увеличивайте сложность.",
+                        "Правильная постановка пальцев - залог успеха. Старайтесь не смотреть на клавиатуру во время работы."
+                    ],
+                    advanced: [
+                        "Философия - это наука о наиболее общих законах развития природы, общества и мышления. Она стремится постичь сущность мира и место человека в нём.",
+                        "Квантовая механика - раздел теоретической физики, описывающий физические явления на малых расстояниях. В этой области привычные законы классической механики перестают работать.",
+                        "Литература эпохи Возрождения характеризуется обращением к античным идеалам, гуманизмом и интересом к человеческой личности. Данте, Петрарка и Боккаччо стали символами этой эпохи."
+                    ],
+                    expert: [
+                        "Синергетический эффект возникает при взаимодействии нескольких факторов, когда их совместное действие превышает простую сумму отдельных воздействий. Это явление широко распространено в сложных системах различной природы.",
+                        "Трансформация цифровых технологий кардинально изменила парадигму современного бизнеса. Конвергенция IT-решений и традиционных отраслей создаёт принципиально новые бизнес-модели.",
+                        "Нейробиологические исследования последних лет демонстрируют удивительную пластичность человеческого мозга. Нейрогенез во взрослом возрасте опровергает ранее существовавшие догмы."
+                    ]
+                },
+                en: {
+                    beginner: [
+                        "Hello, how are you?",
+                        "Today is a nice day.",
+                        "I'm learning to type fast.",
+                        "This trainer helps me.",
+                        "Thank you for this program."
+                    ],
+                    intermediate: [
+                        "Typing speed is an important skill in the modern world. Regular practice will help you achieve excellent results.",
+                        "The keyboard trainer is designed to improve typing skills. Gradually increase the difficulty level.",
+                        "Proper finger position is the key to success. Try not to look at the keyboard while typing."
+                    ],
+                    advanced: [
+                        "Philosophy is the study of the most general laws of nature, society, and thought. It seeks to understand the essence of the world and man's place in it.",
+                        "Quantum mechanics is a branch of theoretical physics that describes physical phenomena at small distances. In this area, the usual laws of classical mechanics cease to work.",
+                        "Renaissance literature is characterized by a return to ancient ideals, humanism and interest in the human personality. Dante, Petrarch and Boccaccio became symbols of this era."
+                    ],
+                    expert: [
+                        "Synergistic effect occurs when several factors interact, when their combined action exceeds the simple sum of individual effects. This phenomenon is widespread in complex systems of various nature.",
+                        "The transformation of digital technologies has radically changed the paradigm of modern business. The convergence of IT solutions and traditional industries creates fundamentally new business models.",
+                        "Neurobiological research in recent years demonstrates the amazing plasticity of the human brain. Neurogenesis in adulthood refutes previously existing dogmas."
+                    ]
+                }
+            };
+            
+            // Состояние тренировки
+            let isTraining = false;
+            let currentLevel = 'beginner';
+            let currentLanguage = 'ru';
+            let currentText = '';
+            let typedText = '';
+            let startTime = 0;
+            let timerInterval = null;
+            let seconds = 0;
+            let totalChars = 0;
+            let correctChars = 0;
+            let errors = 0;
+            let currentPosition = 0;
+            let trainingDuration = 5 * 60; // 5 минут по умолчанию
+            let timeLeft = trainingDuration;
+            let level = 1;
+            let xp = 0;
+            let xpToNextLevel = 100;
+            
+            // Инициализация
+            init();
+            
+            function init() {
+                // Загрузка сохранённого прогресса
+                loadProgress();
+                
+                // Настройка событий
+                setupEventListeners();
+                
+                // Обновление виртуальной клавиатуры
+                updateKeyboardLayout();
+            }
+            
+            function loadProgress() {
+                const savedProgress = localStorage.getItem('keyboardTrainerProgress');
+                if (savedProgress) {
+                    const progress = JSON.parse(savedProgress);
+                    level = progress.level || 1;
+                    xp = progress.xp || 0;
+                    xpToNextLevel = progress.xpToNextLevel || 100;
+                    updateLevelDisplay();
+                }
+            }
+            
+            function saveProgress() {
+                const progress = {
+                    level,
+                    xp,
+                    xpToNextLevel
+                };
+                localStorage.setItem('keyboardTrainerProgress', JSON.stringify(progress));
+            }
+            
+            function setupEventListeners() {
+                // Кнопка старта
+                startBtn.addEventListener('click', startTraining);
+                
+                // Кнопка сброса
+                resetBtn.addEventListener('click', resetTraining);
+                
+                // Выбор сложности
+                difficultyOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        difficultyOptions.forEach(opt => opt.classList.remove('active'));
+                        this.classList.add('active');
+                        currentLevel = this.dataset.level;
+                    });
+                });
+                
+                // Выбор языка
+                languageOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        languageOptions.forEach(opt => opt.classList.remove('active'));
+                        this.classList.add('active');
+                        currentLanguage = this.dataset.lang;
+                        updateKeyboardLayout();
+                    });
+                });
+                
+                // Выбор длительности
+                durationSelect.addEventListener('change', function() {
+                    const minutes = parseInt(this.value);
+                    trainingDuration = minutes * 60;
+                    if (minutes === 0) trainingDuration = 0; // Без ограничений
+                });
+                
+                // Поле ввода
+                inputField.addEventListener('input', checkInput);
+                inputField.addEventListener('keydown', handleKeyDown);
+            }
+            
+            function updateKeyboardLayout() {
+                // Для простоты сделаем только переключение между русской и английской раскладкой
+                // В реальном приложении нужно было бы учитывать физическое положение клавиш
+                if (currentLanguage === 'ru') {
+                    // Русская раскладка
+                    document.querySelector('[data-key="ё"]').textContent = 'ё';
+                    document.querySelector('[data-key="й"]').textContent = 'й';
+                    document.querySelector('[data-key="ц"]').textContent = 'ц';
+                    document.querySelector('[data-key="у"]').textContent = 'у';
+                    document.querySelector('[data-key="к"]').textContent = 'к';
+                    document.querySelector('[data-key="е"]').textContent = 'е';
+                    document.querySelector('[data-key="н"]').textContent = 'н';
+                    document.querySelector('[data-key="г"]').textContent = 'г';
+                    document.querySelector('[data-key="ш"]').textContent = 'ш';
+                    document.querySelector('[data-key="щ"]').textContent = 'щ';
+                    document.querySelector('[data-key="з"]').textContent = 'з';
+                    document.querySelector('[data-key="х"]').textContent = 'х';
+                    document.querySelector('[data-key="ъ"]').textContent = 'ъ';
+                    document.querySelector('[data-key="ф"]').textContent = 'ф';
+                    document.querySelector('[data-key="ы"]').textContent = 'ы';
+                    document.querySelector('[data-key="в"]').textContent = 'в';
+                    document.querySelector('[data-key="а"]').textContent = 'а';
+                    document.querySelector('[data-key="п"]').textContent = 'п';
+                    document.querySelector('[data-key="р"]').textContent = 'р';
+                    document.querySelector('[data-key="о"]').textContent = 'о';
+                    document.querySelector('[data-key="л"]').textContent = 'л';
+                    document.querySelector('[data-key="д"]').textContent = 'д';
+                    document.querySelector('[data-key="ж"]').textContent = 'ж';
+                    document.querySelector('[data-key="э"]').textContent = 'э';
+                    document.querySelector('[data-key="я"]').textContent = 'я';
+                    document.querySelector('[data-key="ч"]').textContent = 'ч';
+                    document.querySelector('[data-key="с"]').textContent = 'с';
+                    document.querySelector('[data-key="м"]').textContent = 'м';
+                    document.querySelector('[data-key="и"]').textContent = 'и';
+                    document.querySelector('[data-key="т"]').textContent = 'т';
+                    document.querySelector('[data-key="ь"]').textContent = 'ь';
+                    document.querySelector('[data-key="б"]').textContent = 'б';
+                    document.querySelector('[data-key="ю"]').textContent = 'ю';
+                } else {
+                    // Английская раскладка
+                    document.querySelector('[data-key="ё"]').textContent = '`';
+                    document.querySelector('[data-key="й"]').textContent = 'q';
+                    document.querySelector('[data-key="ц"]').textContent = 'w';
+                    document.querySelector('[data-key="у"]').textContent = 'e';
+                    document.querySelector('[data-key="к"]').textContent = 'r';
+                    document.querySelector('[data-key="е"]').textContent = 't';
+                    document.querySelector('[data-key="н"]').textContent = 'y';
+                    document.querySelector('[data-key="г"]').textContent = 'u';
+                    document.querySelector('[data-key="ш"]').textContent = 'i';
+                    document.querySelector('[data-key="щ"]').textContent = 'o';
+                    document.querySelector('[data-key="з"]').textContent = 'p';
+                    document.querySelector('[data-key="х"]').textContent = '[';
+                    document.querySelector('[data-key="ъ"]').textContent = ']';
+                    document.querySelector('[data-key="ф"]').textContent = 'a';
+                    document.querySelector('[data-key="ы"]').textContent = 's';
+                    document.querySelector('[data-key="в"]').textContent = 'd';
+                    document.querySelector('[data-key="а"]').textContent = 'f';
+                    document.querySelector('[data-key="п"]').textContent = 'g';
+                    document.querySelector('[data-key="р"]').textContent = 'h';
+                    document.querySelector('[data-key="о"]').textContent = 'j';
+                    document.querySelector('[data-key="л"]').textContent = 'k';
+                    document.querySelector('[data-key="д"]').textContent = 'l';
+                    document.querySelector('[data-key="ж"]').textContent = ';';
+                    document.querySelector('[data-key="э"]').textContent = "'";
+                    document.querySelector('[data-key="я"]').textContent = 'z';
+                    document.querySelector('[data-key="ч"]').textContent = 'x';
+                    document.querySelector('[data-key="с"]').textContent = 'c';
+                    document.querySelector('[data-key="м"]').textContent = 'v';
+                    document.querySelector('[data-key="и"]').textContent = 'b';
+                    document.querySelector('[data-key="т"]').textContent = 'n';
+                    document.querySelector('[data-key="ь"]').textContent = 'm';
+                    document.querySelector('[data-key="б"]').textContent = ',';
+                    document.querySelector('[data-key="ю"]').textContent = '.';
+                }
+            }
+            
+            function startTraining() {
+                if (isTraining) return;
+                
+                isTraining = true;
+                startBtn.textContent = 'Пауза';
+                inputField.disabled = false;
+                inputField.focus();
+                
+                // Выбор случайного текста для тренировки
+                const texts = trainingTexts[currentLanguage][currentLevel];
+                currentText = texts[Math.floor(Math.random() * texts.length)];
+                
+                // Отображение текста
+                displayText();
+                
+                // Сброс статистики
+                typedText = '';
+                totalChars = currentText.length;
+                correctChars = 0;
+                errors = 0;
+                currentPosition = 0;
+                startTime = Date.now();
+                seconds = 0;
+                timeLeft = trainingDuration;
+                
+                // Запуск таймера
+                if (timerInterval) clearInterval(timerInterval);
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                // Обновление интерфейса
+                currentTask.textContent = `Уровень: ${currentLevel}`;
+                hint.textContent = `Язык: ${currentLanguage === 'ru' ? 'Русский' : 'Английский'}`;
+                successMessage.textContent = '';
+                errorMessage.textContent = '';
+                inputField.value = '';
+                
+                // Сброс прогресс-бара
+                progressBar.style.width = '0%';
+            }
+            
+            function displayText() {
+                let html = '';
+                for (let i = 0; i < currentText.length; i++) {
+                    if (i < currentPosition) {
+                        // Уже напечатанные символы
+                        const isCorrect = currentText[i] === typedText[i];
+                        const color = isCorrect ? '#4CAF50' : '#f44336';
+                        html += `<span style="color: ${color}">${currentText[i]}</span>`;
+                    } else if (i === currentPosition) {
+                        // Текущий символ
+                        html += `<span style="background-color: #bb86fc; color: #000; padding: 0 2px;">${currentText[i]}</span>`;
+                    } else {
+                        // Оставшиеся символы
+                        html += currentText[i];
+                    }
+                }
+                textDisplay.innerHTML = html;
+            }
+            
+            function updateTimer() {
+                seconds++;
+                
+                // Обновление отображения таймера
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timer.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                
+                // Проверка времени для режима с ограничением
+                if (trainingDuration > 0) {
+                    timeLeft = trainingDuration - seconds;
+                    if (timeLeft <= 0) {
+                        finishTraining();
+                    }
+                }
+                
+                // Обновление статистики
+                updateStats();
+            }
+            
+            function checkInput() {
+                typedText = inputField.value;
+                const currentChar = currentText[currentPosition];
+                
+                // Проверка текущего символа
+                if (typedText.length > currentPosition) {
+                    const typedChar = typedText[currentPosition];
+                    
+                    if (typedChar === currentChar) {
+                        // Правильный символ
+                        correctChars++;
+                        successMessage.textContent = '✓ Верно!';
+                        errorMessage.textContent = '';
+                    } else {
+                        // Ошибка
+                        errors++;
+                        errorMessage.textContent = '✗ Ошибка';
+                        successMessage.textContent = '';
+                    }
+                    
+                    currentPosition++;
+                    displayText();
+                    
+                    // Обновление прогресса
+                    const progress = (currentPosition / currentText.length) * 100;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Проверка завершения текста
+                    if (currentPosition >= currentText.length) {
+                        completeText();
+                    }
+                }
+                
+                // Обновление статистики
+                updateStats();
+            }
+            
+            function handleKeyDown(e) {
+                // Подсветка нажатой клавиши на виртуальной клавиатуре
+                const key = e.key.toLowerCase();
+                const keyElement = document.querySelector(`[data-key="${key}"]`);
+                
+                if (keyElement) {
+                    keyElement.classList.add('active');
+                    
+                    // Удаление подсветки после отпускания клавиши
+                    setTimeout(() => {
+                        keyElement.classList.remove('active');
+                    }, 200);
+                }
+                
+                // Обработка специальных клавиш
+                if (e.key === 'Shift') {
+                    document.querySelectorAll('[data-key="Shift"]').forEach(el => el.classList.add('active'));
+                } else if (e.key === 'Control') {
+                    document.querySelectorAll('[data-key="Control"]').forEach(el => el.classList.add('active'));
+                } else if (e.key === 'Alt') {
+                    document.querySelectorAll('[data-key="Alt"]').forEach(el => el.classList.add('active'));
+                }
+            }
+            
+            function completeText() {
+                // Расчет времени и скорости
+                const timeSpent = (Date.now() - startTime) / 1000; // в секундах
+                const minutesSpent = timeSpent / 60;
+                
+                // Символов в минуту
+                const cpm = Math.round(currentText.length / minutesSpent);
+                
+                // Слов в минуту (слово = 5 символов)
+                const wpm = Math.round(cpm / 5);
+                
+                // Точность
+                const accuracy = Math.round((correctChars / currentText.length) * 100);
+                
+                // Начисление опыта
+                const xpGained = calculateXPGain(cpm, accuracy);
+                xp += xpGained;
+                
+                // Проверка повышения уровня
+                if (xp >= xpToNextLevel) {
+                    level++;
+                                      xp -= xpToNextLevel;
+                    xpToNextLevel = Math.round(xpToNextLevel * 1.5); // Увеличиваем требуемый опыт для следующего уровня
+                    updateLevelDisplay();
+                    
+                    // Поздравление с новым уровнем
+                    successMessage.textContent = `Поздравляем! Вы достигли уровня ${level}!`;
+                    setTimeout(() => {
+                        successMessage.textContent = '';
+                    }, 3000);
+                }
+                
+                // Сохранение прогресса
+                saveProgress();
+                
+                // Вывод статистики
+                currentTask.textContent = `Завершено! Скорость: ${wpm} слов/мин, Точность: ${accuracy}%`;
+                hint.textContent = `Опыт получено: +${xpGained}`;
+                
+                // Подготовка к следующему тексту
+                setTimeout(() => {
+                    if (isTraining) {
+                        const texts = trainingTexts[currentLanguage][currentLevel];
+                        currentText = texts[Math.floor(Math.random() * texts.length)];
+                        typedText = '';
+                        totalChars += currentText.length;
+                        currentPosition = 0;
+                        inputField.value = '';
+                        displayText();
+                        progressBar.style.width = '0%';
+                    }
+                }, 2000);
+            }
+            
+            function calculateXPGain(cpm, accuracy) {
+                // Базовый опыт зависит от скорости и точности
+                let baseXP = Math.round(cpm / 5);
+                
+                // Множитель за точность
+                const accuracyMultiplier = accuracy / 100;
+                baseXP = Math.round(baseXP * accuracyMultiplier);
+                
+                // Бонус за сложность
+                const difficultyBonus = {
+                    beginner: 1,
+                    intermediate: 1.2,
+                    advanced: 1.5,
+                    expert: 2
+                };
+                
+                baseXP = Math.round(baseXP * difficultyBonus[currentLevel]);
+                
+                // Минимальный опыт - 1
+                return Math.max(1, baseXP);
+            }
+            
+            function updateStats() {
+                const timeSpent = (Date.now() - startTime) / 1000 / 60; // в минутах
+                
+                if (timeSpent > 0) {
+                    // Символов в минуту
+                    const cpm = Math.round(currentPosition / timeSpent);
+                    
+                    // Слов в минуту (слово = 5 символов)
+                    const wpm = Math.round(cpm / 5);
+                    
+                    // Точность
+                    const accuracy = currentPosition > 0 ? Math.round((correctChars / currentPosition) * 100) : 100;
+                    
+                    // Обновление отображения
+                    wpmDisplay.textContent = wpm;
+                    cpmDisplay.textContent = cpm;
+                    accuracyDisplay.textContent = `${accuracy}%`;
+                    
+                    // Обновление полоски точности
+                    accuracyBar.style.transform = `scaleX(${accuracy / 100})`;
+                }
+            }
+            
+            function updateLevelDisplay() {
+                levelDisplay.textContent = `Уровень: ${level} (${xp}/${xpToNextLevel} XP)`;
+                progressBar.style.width = `${(xp / xpToNextLevel) * 100}%`;
+            }
+            
+            function finishTraining() {
+                clearInterval(timerInterval);
+                isTraining = false;
+                startBtn.textContent = 'Начать';
+                inputField.disabled = true;
+                
+                // Расчет итоговой статистики
+                const timeSpent = seconds / 60; // в минутах
+                const cpm = Math.round(correctChars / timeSpent);
+                const wpm = Math.round(cpm / 5);
+                const accuracy = Math.round((correctChars / (correctChars + errors)) * 100;
+                
+                currentTask.textContent = `Тренировка завершена!`;
+                hint.textContent = `Итог: ${wpm} слов/мин, Точность: ${accuracy}%`;
+                
+                // Начисление опыта за завершённую тренировку
+                const xpGained = calculateXPGain(cpm, accuracy);
+                xp += xpGained;
+                
+                // Проверка повышения уровня
+                if (xp >= xpToNextLevel) {
+                    level++;
+                    xp -= xpToNextLevel;
+                    xpToNextLevel = Math.round(xpToNextLevel * 1.5);
+                    successMessage.textContent = `Поздравляем! Вы достигли уровня ${level}!`;
+                    setTimeout(() => {
+                        successMessage.textContent = '';
+                    }, 3000);
+                }
+                
+                updateLevelDisplay();
+                saveProgress();
+            }
+            
+            function resetTraining() {
+                clearInterval(timerInterval);
+                isTraining = false;
+                startBtn.textContent = 'Начать';
+                inputField.disabled = true;
+                inputField.value = '';
+                
+                // Сброс таймера и статистики
+                timer.textContent = '00:00';
+                seconds = 0;
+                currentPosition = 0;
+                correctChars = 0;
+                errors = 0;
+                
+                // Сброс отображения
+                textDisplay.textContent = 'Нажмите "Начать", чтобы начать тренировку';
+                currentTask.textContent = 'Готов к работе';
+                hint.textContent = 'Выберите настройки и нажмите "Начать"';
+                successMessage.textContent = '';
+                errorMessage.textContent = '';
+                wpmDisplay.textContent = '0';
+                cpmDisplay.textContent = '0';
+                accuracyDisplay.textContent = '100%';
+                progressBar.style.width = '0%';
+                accuracyBar.style.transform = 'scaleX(1)';
+            }
+            
+            // Добавляем обработку отпускания специальных клавиш
+            document.addEventListener('keyup', function(e) {
+                if (e.key === 'Shift') {
+                    document.querySelectorAll('[data-key="Shift"]').forEach(el => el.classList.remove('active'));
+                } else if (e.key === 'Control') {
+                    document.querySelectorAll('[data-key="Control"]').forEach(el => el.classList.remove('active'));
+                } else if (e.key === 'Alt') {
+                    document.querySelectorAll('[data-key="Alt"]').forEach(el => el.classList.remove('active'));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
