@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёры клавиатуры</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #000;
+            color: #fff;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #bb86fc;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .trainer-card {
+            width: 100%;
+            max-width: 600px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(187, 134, 252, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-left: 5px solid #bb86fc;
+        }
+        
+        .trainer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(187, 134, 252, 0.3);
+        }
+        
+        .trainer-title {
+            font-size: 24px;
+            color: #ffeb3b;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .trainer-description {
+            color: #ccc;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: #bb86fc;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background-color: #ffeb3b;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #bb86fc;
+        }
+        
+        .keyboard-icon {
+            font-size: 50px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #bb86fc;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тренажёры клавиатуры</h1>
+    
+    <div class="container">
+        <div class="trainer-card">
+            <div class="keyboard-icon">⌨️</div>
+            <h2 class="trainer-title">Клавиатурный тренажёр</h2>
+            <p class="trainer-description">Улучшите скорость и точность печати, освойте слепой метод набора текста</p>
+            <a href="keyboard-trainer.html" class="btn">Начать тренировку</a>
+        </div>
+        
+        <div class="trainer-card">
+            <div class="keyboard-icon">⚡</div>
+            <h2 class="trainer-title">Тренажёр горячих клавиш</h2>
+            <p class="trainer-description">Освойте комбинации клавиш для быстрой работы в программах и ОС</p>
+            <a href="hotkeys-trainer.html" class="btn">Начать тренировку</a>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="total-sessions">0</div>
+                <div class="stat-label">Всего сессий</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="total-time">0</div>
+                <div class="stat-label">Минут тренировки</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="progress">0%</div>
+                <div class="stat-label">Прогресс</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        © 2023 Тренажёры клавиатуры. Все права защищены.
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загрузка статистики из localStorage
+            const totalSessions = localStorage.getItem('totalSessions') || 0;
+            const totalTime = localStorage.getItem('totalTime') || 0;
+            const progress = localStorage.getItem('progress') || 0;
+            
+            document.getElementById('total-sessions').textContent = totalSessions;
+            document.getElementById('total-time').textContent = totalTime;
+            document.getElementById('progress').textContent = `${progress}%`;
+            
+            // Анимация при загрузке
+            const cards = document.querySelectorAll('.trainer-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s, transform 0.5s';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 300 * index);
+            });
+            
+            // Обновление статистики при переходе на тренажёры
+            const links = document.querySelectorAll('.btn');
+            links.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Увеличиваем счетчик сессий
+                    const newSessions = parseInt(totalSessions) + 1;
+                    localStorage.setItem('totalSessions', newSessions);
+                    
+                    // Плавный переход
+                    event.preventDefault();
+                    document.body.style.opacity = '0.7';
+                    document.body.style.transition = 'opacity 0.3s';
+                    
+                    setTimeout(() => {
+                        window.location.href = link.getAttribute('href');
+                    }, 300);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
