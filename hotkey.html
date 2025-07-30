@@ -12,6 +12,8 @@
             padding: 20px;
             background-color: #000;
             color: #fff;
+            position: relative;
+            padding-bottom: 80px; /* Добавляем отступ для кнопки "На главную" */
         }
         
         h1 {
@@ -279,6 +281,7 @@
             font-size: 14px;
             color: #bb86fc;
         }
+        
         .home-btn {
             position: fixed;
             bottom: 20px;
@@ -299,6 +302,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             z-index: 100;
         }
+        
         .home-btn:hover {
             background-color: #ffeb3b;
             transform: scale(1.1);
@@ -533,10 +537,6 @@
                 usedShortcuts = [];
                 updateStats();
                 startBtn.textContent = 'Перезапустить';
-                                // Кнопка домой
-                homeBtn.addEventListener('click', () => {
-                    window.location.href = 'index.html';
-                });
                 
                 // Установка времени в зависимости от сложности
                 setTimeLimit();
@@ -547,6 +547,11 @@
                 timerInterval = setInterval(updateTimer, 1000);
                 
                 nextTask();
+            });
+            
+            // Обработчик кнопки "На главную"
+            homeBtn.addEventListener('click', function() {
+                window.location.href = 'index.html'; // Замените на нужный URL главной страницы
             });
             
             // Установка уровня сложности
