@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр управления мышкой</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1e1e1e;
+            color: #fff;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        .header {
+            background-color: #121212;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        h1 {
+            margin: 0;
+            color: #bb86fc;
+        }
+        
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #252525;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .training-area {
+            flex: 1;
+            position: relative;
+            background-color: #2d2d2d;
+            overflow: hidden;
+        }
+        
+        .target {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background-color: #bb86fc;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .target:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .target:active {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+        
+        .stats {
+            margin-bottom: 20px;
+            background-color: #383838;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            color: #bb86fc;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #ffeb3b;
+        }
+        
+        .controls {
+            margin-top: 20px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #bb86fc;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background-color: #ffeb3b;
+        }
+        
+        .difficulty-options {
+            margin-top: 20px;
+        }
+        
+        .difficulty-option {
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: #383838;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-option:hover {
+            background-color: #424242;
+        }
+        
+        .difficulty-option.active {
+            background-color: #bb86fc;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .cursor-trail {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background-color: rgba(187, 134, 252, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #383838;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #bb86fc;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffeb3b;
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .home-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #bb86fc;
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .home-btn:hover {
+            background-color: #ffeb3b;
+            transform: scale(1.1);
+        }
+        
+        .success-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #4CAF50;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .drag-target {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #ff9800;
+            border-radius: 8px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .drop-zone {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 3px dashed #bb86fc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #bb86fc;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Тренажёр управления мышкой</h1>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Попаданий:</span>
+                    <span class="stat-value" id="hits-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Промахов:</span>
+                    <span class="stat-value" id="misses-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Точность:</span>
+                    <span class="stat-value" id="accuracy">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Скорость:</span>
+                    <span class="stat-value" id="speed">0/мин</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Рекорд:</span>
+                    <span class="stat-value" id="record">0</span>
+                </div>
+            </div>
+            
+            <div class="timer" id="timer">00:00</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <div class="controls">
+                <button id="start-btn">Начать тренировку</button>
+                <button id="reset-btn">Сбросить</button>
+            </div>
+            
+            <div class="difficulty-options">
+                <h3 style="color: #bb86fc; margin-bottom: 10px;">Уровень сложности</h3>
+                <div class="difficulty-option active" data-level="easy">Новичок</div>
+                <div class="difficulty-option" data-level="medium">Средний</div>
+                <div class="difficulty-option" data-level="hard">Сложный</div>
+                <div class="difficulty-option" data-level="expert">Эксперт</div>
+            </div>
+        </div>
+        
+        <div class="training-area" id="training-area">
+            <div class="success-message" id="success-message"></div>
+            <!-- Тут будут появляться цели -->
+        </div>
+    </div>
+    
+    <button class="home-btn" id="home-btn" title="На главную">⌂</button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы интерфейса
+            const trainingArea = document.getElementById('training-area');
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const homeBtn = document.getElementById('home-btn');
+            const hitsCount = document.getElementById('hits-count');
+            const missesCount = document.getElementById('misses-count');
+            const accuracy = document.getElementById('accuracy');
+            const speed = document.getElementById('speed');
+            const record = document.getElementById('record');
+            const timer = document.getElementById('timer');
+            const progressBar = document.getElementById('progress-bar');
+            const successMessage = document.getElementById('success-message');
+            const difficultyOptions = document.querySelectorAll('.difficulty-option');
+            
+            // Состояние тренировки
+            let isTraining = false;
+            let hits = 0;
+            let misses = 0;
+            let totalTargets = 0;
+            let timerInterval = null;
+            let seconds = 0;
+            let targetInterval = null;
+            let difficulty = 'easy';
+            let targetSpeed = 2000;
+            let targetSize = 40;
+            let maxTargets = 20;
+            let currentTarget = null;
+            let cursorTrails = [];
+            let maxTrails = 15;
+            let personalRecord = localStorage.getItem('mouseTrainerRecord') || 0;
+            let isDragging = false;
+            let dragTarget = null;
+            let dropZone = null;
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+            
+            // Инициализация
+            updateStats();
+            record.textContent = personalRecord;
+            
+            // Начать тренировку
+            startBtn.addEventListener('click', function() {
+                if (isTraining) {
+                    // Пауза
+                    isTraining = false;
+                    clearInterval(timerInterval);
+                    clearInterval(targetInterval);
+                    startBtn.textContent = 'Продолжить';
+                    return;
+                }
+                
+                isTraining = true;
+                hits = 0;
+                misses = 0;
+                totalTargets = 0;
+                seconds = 0;
+                updateStats();
+                startBtn.textContent = 'Пауза';
+                
+                // Очистка области
+                clearTrainingArea();
+                
+                // Запуск таймера
+                if (timerInterval) clearInterval(timerInterval);
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                // Создание целей
+                createTarget();
+                targetInterval = setInterval(createTarget, targetSpeed);
+                
+                // Для сложных уровней добавляем перетаскивание
+                if (difficulty === 'hard' || difficulty === 'expert') {
+                    createDragAndDropTask();
+                }
+            });
+            
+            // Сброс тренировки
+            resetBtn.addEventListener('click', function() {
+                isTraining = false;
+                clearInterval(timerInterval);
+                clearInterval(targetInterval);
+                startBtn.textContent = 'Начать тренировку';
+                clearTrainingArea();
+                updateStats();
+                timer.textContent = '00:00';
+                progressBar.style.width = '0%';
+            });
+            
+            // Кнопка "На главную"
+            homeBtn.addEventListener('click', function() {
+                window.location.href = 'index.html'; // Замените на нужный URL
+            });
+            
+            // Выбор сложности
+            difficultyOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    difficultyOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+                    
+                    // Настройка параметров в зависимости от сложности
+                    switch(difficulty) {
+                        case 'easy':
+                            targetSpeed = 2000;
+                            targetSize = 40;
+                            maxTargets = 20;
+                            break;
+                        case 'medium':
+                            targetSpeed = 1500;
+                            targetSize = 30;
+                            maxTargets = 30;
+                            break;
+                        case 'hard':
+                            targetSpeed = 1200;
+                            targetSize = 25;
+                            maxTargets = 40;
+                            break;
+                        case 'expert':
+                            targetSpeed = 900; // Было 700, стало 900 (немного медленнее)
+                            targetSize = 22; // Было 20, стало 22 (немного больше)
+                            maxTargets = 50;
+                            break;
+                    }
+                });
+            });
+            
+            // Создание цели
+            function createTarget() {
+                if (!isTraining || totalTargets >= maxTargets) {
+                    if (totalTargets >= maxTargets) {
+                        finishTraining();
+                    }
+                    return;
+                }
+                
+                // Удаляем предыдущую цель, если она есть
+                if (currentTarget) {
+                    currentTarget.remove();
+                    misses++;
+                    updateStats();
+                }
+                
+                // Создаем новую цель
+                currentTarget = document.createElement('div');
+                currentTarget.className = 'target';
+                currentTarget.style.width = `${targetSize}px`;
+                currentTarget.style.height = `${targetSize}px`;
+                
+                // Случайное положение (избегаем краев экрана)
+                const areaWidth = trainingArea.clientWidth;
+                const areaHeight = trainingArea.clientHeight;
+                
+                const minDistanceFromEdge = 50;
+                const x = minDistanceFromEdge + Math.random() * (areaWidth - minDistanceFromEdge * 2);
+                const y = minDistanceFromEdge + Math.random() * (areaHeight - minDistanceFromEdge * 2);
+                
+                currentTarget.style.left = `${x}px`;
+                currentTarget.style.top = `${y}px`;
+                currentTarget.textContent = totalTargets + 1;
+                
+                // Обработчик клика
+                currentTarget.addEventListener('click', function() {
+                    hits++;
+                    totalTargets++;
+                    updateStats();
+                    
+                    // Анимация успеха
+                    successMessage.textContent = '+1';
+                    successMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        successMessage.style.opacity = '0';
+                    }, 300);
+                    
+                    // Удаляем цель
+                    currentTarget.remove();
+                    currentTarget = null;
+                    
+                    // Обновляем прогресс
+                    updateProgress();
+                    
+                    // Проверяем, не закончилась ли тренировка
+                    if (totalTargets >= maxTargets) {
+                        finishTraining();
+                    }
+                });
+                
+                trainingArea.appendChild(currentTarget);
+                totalTargets++;
+                updateProgress();
+            }
+            
+            // Создание задачи на перетаскивание (для сложных уровней)
+            function createDragAndDropTask() {
+                // Удаляем предыдущие элементы
+                if (dragTarget) dragTarget.remove();
+                if (dropZone) dropZone.remove();
+                
+                // Создаем зону для перетаскивания
+                dropZone = document.createElement('div');
+                dropZone.className = 'drop-zone';
+                dropZone.textContent = 'Перетащи сюда';
+                
+                const areaWidth = trainingArea.clientWidth;
+                const areaHeight = trainingArea.clientHeight;
+                
+                // Позиция зоны (не слишком близко к краям)
+                const minDistance = 100;
+                const zoneX = minDistance + Math.random() * (areaWidth - minDistance * 2);
+                const zoneY = minDistance + Math.random() * (areaHeight - minDistance * 2);
+                
+                dropZone.style.left = `${zoneX}px`;
+                dropZone.style.top = `${zoneY}px`;
+                trainingArea.appendChild(dropZone);
+                
+                // Создаем элемент для перетаскивания
+                dragTarget = document.createElement('div');
+                dragTarget.className = 'drag-target';
+                dragTarget.textContent = 'Drag me';
+                dragTarget.draggable = true;
+                
+                // Позиция элемента (не слишком близко к зоне и краям)
+                const targetX = minDistance + Math.random() * (areaWidth - minDistance * 2);
+                const targetY = minDistance + Math.random() * (areaHeight - minDistance * 2);
+                
+                // Убедимся, что элемент не слишком близко к зоне
+                const minDistanceFromZone = 200;
+                if (Math.abs(targetX - zoneX) < minDistanceFromZone && 
+                    Math.abs(targetY - zoneY) < minDistanceFromZone) {
+                    // Если слишком близко, перемещаем в противоположную сторону
+                    dragTarget.style.left = `${zoneX + (zoneX < areaWidth/2 ? minDistanceFromZone : -minDistanceFromZone)}px`;
+                    dragTarget.style.top = `${zoneY + (zoneY < areaHeight/2 ? minDistanceFromZone : -minDistanceFromZone)}px`;
+                } else {
+                    dragTarget.style.left = `${targetX}px`;
+                    dragTarget.style.top = `${targetY}px`;
+                }
+                
+                trainingArea.appendChild(dragTarget);
+                
+                // Обработчики перетаскивания
+                dragTarget.addEventListener('dragstart', function(e) {
+                    isDragging = true;
+                    e.dataTransfer.setData('text/plain', 'drag-target');
+                    setTimeout(() => {
+                        dragTarget.style.display = 'none';
+                    }, 0);
+                });
+                
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    dropZone.style.backgroundColor = 'rgba(187, 134, 252, 0.2)';
+                });
+                
+                dropZone.addEventListener('dragleave', function() {
+                    dropZone.style.backgroundColor = 'transparent';
+                });
+                
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    dropZone.style.backgroundColor = 'transparent';
+                    
+                    if (isDragging) {
+                        dragTarget.style.display = 'flex';
+                        dragTarget.style.left = `${parseInt(dropZone.style.left) + 10}px`;
+                        dragTarget.style.top = `${parseInt(dropZone.style.top) + 10}px`;
+                        
+                        // Успешное завершение
+                        hits += 3; // Даем больше очков за сложное задание
+                        updateStats();
+                        
+                        // Анимация успеха
+                        successMessage.textContent = 'Отлично! +3';
+                        successMessage.style.opacity = '1';
+                        setTimeout(() => {
+                            successMessage.style.opacity = '0';
+                        }, 1000);
+                        
+                        // Создаем новую задачу через 1.5 секунды
+                        setTimeout(() => {
+                            createDragAndDropTask();
+                        }, 1500);
+                        
+                        isDragging = false;
+                    }
+                });
+            }
+            
+            // Обновление статистики
+            function updateStats() {
+                hitsCount.textContent = hits;
+                missesCount.textContent = misses;
+                
+                const totalAttempts = hits + misses;
+                const acc = totalAttempts > 0 ? Math.round((hits / totalAttempts) * 100) : 0;
+                accuracy.textContent = `${acc}%`;
+                
+                const spd = seconds > 0 ? Math.round((hits / seconds) * 60) : 0;
+                speed.textContent = `${spd}/мин`;
+                
+                // Обновление рекорда
+                if (hits > personalRecord) {
+                    personalRecord = hits;
+                    record.textContent = personalRecord;
+                    localStorage.setItem('mouseTrainerRecord', personalRecord);
+                }
+            }
+            
+            // Обновление таймера
+            function updateTimer() {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                timer.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+            
+            // Обновление прогресса
+            function updateProgress() {
+                const progress = (totalTargets / maxTargets) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+            
+            // Завершение тренировки
+            function finishTraining() {
+                isTraining = false;
+                clearInterval(timerInterval);
+                clearInterval(targetInterval);
+                startBtn.textContent = 'Начать заново';
+                
+                if (currentTarget) {
+                    currentTarget.remove();
+                    currentTarget = null;
+                }
+                
+                // Показываем результаты
+                successMessage.textContent = `Тренировка завершена!\nРезультат: ${hits} из ${maxTargets}`;
+                successMessage.style.opacity = '1';
+                successMessage.style.textAlign = 'center';
+                successMessage.style.whiteSpace = 'pre-line';
+            }
+            
+            // Очистка тренировочной области
+            function clearTrainingArea() {
+                trainingArea.innerHTML = '';
+                trainingArea.appendChild(successMessage);
+                currentTarget = null;
+                totalTargets = 0;
+                successMessage.style.opacity = '0';
+                
+                // Очищаем следы курсора
+                cursorTrails.forEach(trail => trail.remove());
+                cursorTrails = [];
+            }
+            
+            // След от курсора (визуализация движения)
+            trainingArea.addEventListener('mousemove', function(e) {
+                if (!isTraining) return;
+                
+                // Запоминаем текущие координаты
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                
+                // Создаем след точно под курсором
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.style.left = `${e.clientX}px`;
+                trail.style.top = `${e.clientY}px`;
+                
+                // Добавляем небольшое смещение для лучшей видимости
+                trail.style.transform = 'translate(-50%, -50%)';
+                
+                trainingArea.appendChild(trail);
+                cursorTrails.push(trail);
+                
+                // Ограничиваем количество следов
+                if (cursorTrails.length > maxTrails) {
+                    const oldTrail = cursorTrails.shift();
+                    if (oldTrail && oldTrail.parentNode) {
+                        oldTrail.parentNode.removeChild(oldTrail);
+                    }
+                }
+                
+                // Плавное исчезновение следов
+                setTimeout(() => {
+                    if (trail.parentNode) {
+                        trail.style.opacity = '0';
+                        trail.style.transition = 'opacity 0.5s';
+                        setTimeout(() => {
+                            if (trail.parentNode) {
+                                trail.parentNode.removeChild(trail);
+                            }
+                        }, 500);
+                    }
+                }, 500);
+            });
+            
+            // Обработка кликов мимо цели
+            trainingArea.addEventListener('click', function(e) {
+                if (!isTraining || !currentTarget) return;
+                
+                // Проверяем, был ли клик по цели
+                if (e.target !== currentTarget && e.target !== dragTarget) {
+                    misses++;
+                    updateStats();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
