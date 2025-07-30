@@ -279,6 +279,30 @@
             font-size: 14px;
             color: #bb86fc;
         }
+        .home-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            background-color: #bb86fc;
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+        .home-btn:hover {
+            background-color: #ffeb3b;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -420,12 +444,13 @@
             </div>
         </div>
     </div>
-    
+    <button class="home-btn" id="home-btn" title="На главную">⌂</button>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Элементы интерфейса
             const startBtn = document.getElementById('start-btn');
             const currentTask = document.getElementById('current-task');
+            const homeBtn = document.getElementById('home-btn');
             const hint = document.getElementById('hint');
             const keyPressDisplay = document.getElementById('key-press-display');
             const successMessage = document.getElementById('success-message');
