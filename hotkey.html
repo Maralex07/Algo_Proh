@@ -533,6 +533,10 @@
                 usedShortcuts = [];
                 updateStats();
                 startBtn.textContent = 'Перезапустить';
+                                // Кнопка домой
+                homeBtn.addEventListener('click', () => {
+                    window.location.href = 'index.html';
+                });
                 
                 // Установка времени в зависимости от сложности
                 setTimeLimit();
