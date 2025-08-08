@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр табличного редактора</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            height: 20px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+            background-color: #3498db;
+            width: 10%;
+            transition: width 0.3s;
+        }
+
+        .progress-container span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .task-container {
+            margin-bottom: 30px;
+        }
+
+        .task-description {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .spreadsheet-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .toolbar {
+            background-color: #f1f1f1;
+            padding: 8px;
+            display: flex;
+            gap: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .toolbar button, .toolbar select {
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .toolbar button:hover {
+            background-color: #e9e9e9;
+        }
+
+        .spreadsheet {
+            overflow: auto;
+            max-height: 400px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            min-width: 100px;
+            height: 30px;
+            position: relative;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            background-color: white;
+        }
+
+        td.selected {
+            background-color: #e3f2fd;
+            outline: 2px solid #2196F3;
+        }
+
+        td input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 0 5px;
+            font-size: inherit;
+            background-color: transparent;
+        }
+
+        td input:focus {
+            outline: none;
+        }
+
+        .formula-bar {
+            display: flex;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .formula-bar span {
+            padding: 8px 10px;
+            background-color: #f1f1f1;
+            border-right: 1px solid #ddd;
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .formula-bar input {
+            flex-grow: 1;
+            padding: 8px;
+            border: none;
+            font-size: 14px;
+        }
+
+        .formula-bar input:focus {
+            outline: none;
+        }
+
+        .feedback {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .feedback.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .feedback.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .hint-btn {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .hint-btn:hover {
+            background-color: #e67e22;
+        }
+
+        .check-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .check-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .next-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .next-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .next-btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Модальное окно подсказки */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 10px;
+            }
+            
+            .toolbar {
+                flex-wrap: wrap;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .controls button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Тренажёр табличного редактора</h1>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+                <span id="progressText">1/10</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="task-container">
+                <h2 id="taskTitle">Задание 1: Ввод данных</h2>
+                <div id="taskDescription" class="task-description">
+                    Введите число 100 в ячейку A1 таблицы ниже.
+                </div>
+                
+                <div class="spreadsheet-container">
+                    <div class="toolbar">
+                        <button id="boldBtn" title="Жирный текст"><b>Ж</b></button>
+                        <button id="italicBtn" title="Курсив"><i>К</i></button>
+                        <button id="colorBtn" title="Цвет текста">A</button>
+                        <input type="color" id="colorPicker" style="display: none;">
+                        <select id="fontSize">
+                            <option value="12">12</option>
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                        </select>
+                        <button id="alignLeftBtn" title="Выравнивание по левому краю">◧</button>
+                        <button id="alignCenterBtn" title="Выравнивание по центру">▨</button>
+                        <button id="alignRightBtn" title="Выравнивание по правому краю">◨</button>
+                    </div>
+                    
+                    <div class="spreadsheet" id="spreadsheet">
+                        <!-- Сюда будет вставлена таблица через JS -->
+                    </div>
+                </div>
+                
+                <div class="formula-bar">
+                    <span id="activeCellInfo">A1</span>
+                    <input type="text" id="formulaInput" placeholder="Введите значение или формулу">
+                </div>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="controls">
+                <button id="hintBtn" class="hint-btn">Подсказка</button>
+                <button id="checkBtn" class="check-btn">Проверить</button>
+                <button id="nextBtn" class="next-btn" disabled>Следующее задание</button>
+            </div>
+        </main>
+    </div>
+    
+    <div id="hintModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Подсказка</h3>
+            <p id="hintText"></p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Конфигурация тренажёра
+            const tasks = [
+                {
+                    id: 1,
+                    title: "Задание 1: Ввод данных",
+                    getDescription: function() {
+                        const col = String.fromCharCode(65 + Math.floor(Math.random() * 10));
+                        const row = Math.floor(Math.random() * 10) + 1;
+                        this.targetCell = `${col}${row}`;
+                        this.targetValue = Math.floor(Math.random() * 900) + 100;
+                        return `Введите число ${this.targetValue} в ячейку ${this.targetCell} таблицы ниже.`;
+                    },
+                    getHint: function() {
+                        return `Кликните на ячейку ${this.targetCell}, введите число ${this.targetValue} и нажмите Enter или кликните на другую ячейку.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        return sheet[row][col].value === this.targetValue.toString();
+                    }
+                },
+                {
+                    id: 2,
+                    title: "Задание 2: Форматирование текста",
+                    getDescription: function() {
+                        const col = String.fromCharCode(65 + Math.floor(Math.random() * 10));
+                        const row = Math.floor(Math.random() * 10) + 1;
+                        this.targetCell = `${col}${row}`;
+                        const colors = ["красный", "синий", "зелёный", "оранжевый", "фиолетовый"];
+                        this.targetColor = colors[Math.floor(Math.random() * colors.length)];
+                        return `Сделайте текст в ячейке ${this.targetCell} жирным и ${this.targetColor} цвета.`;
+                    },
+                    getHint: function() {
+                        const colorCodes = {
+                            "красный": "#ff0000",
+                            "синий": "#0000ff",
+                            "зелёный": "#00ff00",
+                            "оранжевый": "#ffa500",
+                            "фиолетовый": "#800080"
+                        };
+                        return `Выделите ячейку ${this.targetCell}, затем нажмите кнопку 'Ж' для жирного текста и выберите ${this.targetColor} цвет (${colorCodes[this.targetColor]}) с помощью кнопки 'A'.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        const cell = sheet[row][col];
+                        const colorCodes = {
+                            "красный": "#ff0000",
+                            "синий": "#0000ff",
+                            "зелёный": "#00ff00",
+                            "оранжевый": "#ffa500",
+                            "фиолетовый": "#800080"
+                        };
+                        return cell.isBold && cell.color.toLowerCase() === colorCodes[this.targetColor];
+                    }
+                },
+                {
+                    id: 3,
+                    title: "Задание 3: Простая формула",
+                    getDescription: function() {
+                        const col1 = String.fromCharCode(65 + Math.floor(Math.random() * 8));
+                        const row1 = Math.floor(Math.random() * 8) + 1;
+                        const col2 = String.fromCharCode(col1.charCodeAt(0) + 1 + Math.floor(Math.random() * 2));
+                        const row2 = row1 + Math.floor(Math.random() * 2);
+                        this.cell1 = `${col1}${row1}`;
+                        this.cell2 = `${col2}${row2}`;
+                        this.targetCell = `${String.fromCharCode(Math.max(col1.charCodeAt(0), col2.charCodeAt(0)) + 1)}${Math.max(row1, row2) + 1}`;
+                        this.operation = ["+", "-", "*"][Math.floor(Math.random() * 3)];
+                        return `В ячейке ${this.targetCell} введите формулу для ${this.operation === '+' ? 'сложения' : this.operation === '-' ? 'вычитания' : 'умножения'} значений из ${this.cell1} и ${this.cell2} (=${this.cell1}${this.operation}${this.cell2}).`;
+                    },
+                    getHint: function() {
+                        return `В ячейке ${this.targetCell} введите знак '=', затем кликните на ${this.cell1}, введите '${this.operation}', затем кликните на ${this.cell2} и нажмите Enter.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        return sheet[row][col].formula === `=${this.cell1}${this.operation}${this.cell2}`;
+                    }
+                },
+                {
+                    id: 4,
+                    title: "Задание 4: Выравнивание текста",
+                    getDescription: function() {
+                        const col = String.fromCharCode(65 + Math.floor(Math.random() * 10));
+                        const row = Math.floor(Math.random() * 10) + 1;
+                        this.targetCell = `${col}${row}`;
+                        const aligns = ["левому краю", "центру", "правому краю"];
+                        this.align = ["left", "center", "right"][Math.floor(Math.random() * 3)];
+                        this.alignText = aligns[Math.floor(Math.random() * 3)];
+                        return `Выровняйте текст в ячейке ${this.targetCell} по ${this.alignText}.`;
+                    },
+                    getHint: function() {
+                        return `Выделите ячейку ${this.targetCell} и нажмите кнопку выравнивания по ${this.alignText} в панели инструментов.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        return sheet[row][col].align === this.align;
+                    }
+                },
+                {
+                    id: 5,
+                    title: "Задание 5: Изменение размера шрифта",
+                    getDescription: function() {
+                        const col = String.fromCharCode(65 + Math.floor(Math.random() * 10));
+                        const row = Math.floor(Math.random() * 10) + 1;
+                        this.targetCell = `${col}${row}`;
+                        this.fontSize = [14, 16, 18, 20][Math.floor(Math.random() * 4)];
+                        return `Установите размер шрифта в ячейке ${this.targetCell} на ${this.fontSize}px.`;
+                    },
+                    getHint: function() {
+                        return `Выделите ячейку ${this.targetCell} и выберите размер ${this.fontSize} из выпадающего списка размеров шрифта.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        return sheet[row][col].fontSize === this.fontSize.toString();
+                    }
+                },
+                {
+                    id: 6,
+                    title: "Задание 6: Формула СУММ",
+                    getDescription: function() {
+                        const startCol = String.fromCharCode(65 + Math.floor(Math.random() * 5));
+                        const startRow = Math.floor(Math.random() * 5) + 1;
+                        const endCol = String.fromCharCode(startCol.charCodeAt(0) + Math.floor(Math.random() * 3) + 1);
+                        const endRow = startRow + Math.floor(Math.random() * 3) + 1;
+                        this.range = `${startCol}${startRow}:${endCol}${endRow}`;
+                        this.targetCell = `${String.fromCharCode(endCol.charCodeAt(0) + 1)}${endRow + 1}`;
+                        return `В ячейке ${this.targetCell} введите формулу для суммирования диапазона ${this.range} (=СУММ(${this.range})).`;
+                    },
+                    getHint: function() {
+                        return `В ячейке ${this.targetCell} введите '=СУММ(', затем выделите мышью диапазон ${this.range}, закройте скобку и нажмите Enter.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        return sheet[row][col].formula === `=СУММ(${this.range})`;
+                    }
+                },
+                {
+                    id: 7,
+                    title: "Задание 7: Формула СРЗНАЧ",
+                    getDescription: function() {
+                        const startCol = String.fromCharCode(65 + Math.floor(Math.random() * 5));
+                        const startRow = Math.floor(Math.random() * 5) + 1;
+                        const endCol = String.fromCharCode(startCol.charCodeAt(0) + Math.floor(Math.random() * 3) + 1);
+                        const endRow = startRow + Math.floor(Math.random() * 3) + 1;
+                        this.range = `${startCol}${startRow}:${endCol}${endRow}`;
+                        this.targetCell = `${String.fromCharCode(endCol.charCodeAt(0) + 1)}${endRow + 1}`;
+                        return `В ячейке ${this.targetCell} введите формулу для вычисления среднего значения в диапазоне ${this.range} (=СРЗНАЧ(${this.range})).`;
+                    },
+                    getHint: function() {
+                        return `В ячейке ${this.targetCell} введите '=СРЗНАЧ(', затем выделите мышью диапазон ${this.range}, закройте скобку и нажмите Enter.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        return sheet[row][col].formula === `=СРЗНАЧ(${this.range})`;
+                    }
+                },
+                {
+                    id: 8,
+                    title: "Задание 8: Форматирование нескольких ячеек",
+                    getDescription: function() {
+                        const startCol = String.fromCharCode(65 + Math.floor(Math.random() * 5));
+                        const startRow = Math.floor(Math.random() * 5) + 1;
+                        const endCol = String.fromCharCode(startCol.charCodeAt(0) + Math.floor(Math.random() * 3) + 1);
+                        const endRow = startRow + Math.floor(Math.random() * 3) + 1;
+                        this.range = `${startCol}${startRow}:${endCol}${endRow}`;
+                        this.color = ["#ff0000", "#0000ff", "#00ff00", "#ffa500", "#800080"][Math.floor(Math.random() * 5)];
+                        this.colorName = {
+                            "#ff0000": "красный",
+                            "#0000ff": "синий",
+                            "#00ff00": "зелёный",
+                            "#ffa500": "оранжевый",
+                            "#800080": "фиолетовый"
+                        }[this.color];
+                        return `Выделите диапазон ${this.range} и установите цвет текста ${this.colorName} (${this.color}).`;
+                    },
+                    getHint: function() {
+                        return `Выделите мышью диапазон ${this.range}, затем нажмите кнопку 'A' и выберите цвет ${this.color}.`;
+                    },
+                    check: function(sheet) {
+                        const startColCode = this.range.split(':')[0].charCodeAt(0) - 65;
+                        const startRow = parseInt(this.range.split(':')[0].substring(1)) - 1;
+                        const endColCode = this.range.split(':')[1].charCodeAt(0) - 65;
+                        const endRow = parseInt(this.range.split(':')[1].substring(1)) - 1;
+                        
+                        for (let row = startRow; row <= endRow; row++) {
+                            for (let col = startColCode; col <= endColCode; col++) {
+                                if (sheet[row][col].color !== this.color) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                },
+                {
+                    id: 9,
+                    title: "Задание 9: Комбинированное форматирование",
+                    getDescription: function() {
+                        const col = String.fromCharCode(65 + Math.floor(Math.random() * 10));
+                        const row = Math.floor(Math.random() * 10) + 1;
+                        this.targetCell = `${col}${row}`;
+                        this.align = ["left", "center", "right"][Math.floor(Math.random() * 3)];
+                        this.alignText = ["левому краю", "центру", "правому краю"][Math.floor(Math.random() * 3)];
+                        this.fontSize = [14, 16, 18, 20][Math.floor(Math.random() * 4)];
+                        return `Для ячейки ${this.targetCell} установите: размер шрифта ${this.fontSize}px, выравнивание по ${this.alignText} и курсивное начертание.`;
+                    },
+                    getHint: function() {
+                        return `Выделите ячейку ${this.targetCell}, установите размер шрифта ${this.fontSize}, выравнивание по ${this.alignText} и нажмите кнопку 'К' для курсива.`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        const cell = sheet[row][col];
+                        return cell.fontSize === this.fontSize.toString() && 
+                               cell.align === this.align && 
+                               cell.isItalic;
+                    }
+                },
+                {
+                    id: 10,
+                    title: "Задание 10: Комплексная формула",
+                    getDescription: function() {
+                        const col1 = String.fromCharCode(65 + Math.floor(Math.random() * 5));
+                        const row1 = Math.floor(Math.random() * 5) + 1;
+                        const col2 = String.fromCharCode(col1.charCodeAt(0) + 1 + Math.floor(Math.random() * 2));
+                        const row2 = row1 + Math.floor(Math.random() * 2);
+                        const col3 = String.fromCharCode(col2.charCodeAt(0) + 1 + Math.floor(Math.random() * 2));
+                        const row3 = row2 + Math.floor(Math.random() * 2);
+                        this.cell1 = `${col1}${row1}`;
+                        this.cell2 = `${col2}${row2}`;
+                        this.cell3 = `${col3}${row3}`;
+                        this.targetCell = `${String.fromCharCode(col3.charCodeAt(0) + 1)}${row3 + 1}`;
+                        this.operation1 = ["+", "-"][Math.floor(Math.random() * 2)];
+                        this.operation2 = ["*", "/"][Math.floor(Math.random() * 2)];
+                        return `В ячейке ${this.targetCell} введите формулу: (${this.cell1}${this.operation1}${this.cell2})${this.operation2}${this.cell3}.`;
+                    },
+                    getHint: function() {
+                        return `В ячейке ${this.targetCell} введите формулу: =(${this.cell1}${this.operation1}${this.cell2})${this.operation2}${this.cell3}`;
+                    },
+                    check: function(sheet) {
+                        const col = this.targetCell.charCodeAt(0) - 65;
+                        const row = parseInt(this.targetCell.substring(1)) - 1;
+                        return sheet[row][col].formula === `=(${this.cell1}${this.operation1}${this.cell2})${this.operation2}${this.cell3}`;
+                    }
+                }
+            ];
+
+            // Состояние приложения
+            let currentTask = 0;
+            let spreadsheet = [];
+            let selectedCell = { row: 0, col: 0 };
+            const ROWS = 10;
+            const COLS = 10;
+            
+            // Элементы DOM
+            const taskTitleEl = document.getElementById('taskTitle');
+            const taskDescriptionEl = document.getElementById('taskDescription');
+            const progressBarEl = document.getElementById('progressBar');
+            const progressTextEl = document.getElementById('progressText');
+            const spreadsheetEl = document.getElementById('spreadsheet');
+            const formulaInputEl = document.getElementById('formulaInput');
+            const activeCellInfoEl = document.getElementById('activeCellInfo');
+            const feedbackEl = document.getElementById('feedback');
+            const hintBtnEl = document.getElementById('hintBtn');
+            const checkBtnEl = document.getElementById('checkBtn');
+            const nextBtnEl = document.getElementById('nextBtn');
+            const hintModalEl = document.getElementById('hintModal');
+            const hintTextEl = document.getElementById('hintText');
+            const closeModalEl = document.querySelector('.close');
+            
+            // Элементы панели инструментов
+            const boldBtnEl = document.getElementById('boldBtn');
+            const italicBtnEl = document.getElementById('italicBtn');
+            const colorBtnEl = document.getElementById('colorBtn');
+            const colorPickerEl = document.getElementById('colorPicker');
+            const fontSizeEl = document.getElementById('fontSize');
+            const alignLeftBtnEl = document.getElementById('alignLeftBtn');
+            const alignCenterBtnEl = document.getElementById('alignCenterBtn');
+            const alignRightBtnEl = document.getElementById('alignRightBtn');
+            
+            // Инициализация таблицы
+            function initSpreadsheet() {
+                spreadsheet = [];
+                spreadsheetEl.innerHTML = '';
+                
+                // Создаем заголовки столбцов (A, B, C, ...)
+                const headerRow = document.createElement('tr');
+                headerRow.appendChild(document.createElement('th')); // Пустой уголок
+                
+                for (let col = 0; col < COLS; col++) {
+                    const th = document.createElement('th');
+                    th.textContent = String.fromCharCode(65 + col);
+                    headerRow.appendChild(th);
+                }
+                
+                spreadsheetEl.appendChild(headerRow);
+                
+                // Создаем строки таблицы
+                for (let row = 0; row < ROWS; row++) {
+                    const tr = document.createElement('tr');
+                    const rowHeader = document.createElement('th');
+                    rowHeader.textContent = row + 1;
+                    tr.appendChild(rowHeader);
+                    
+                    const rowData = [];
+                    
+                    for (let col = 0; col < COLS; col++) {
+                        const td = document.createElement('td');
+                        const input = document.createElement('input');
+                        
+                        // Инициализация ячейки
+                        const cell = {
+                            value: '',
+                            formula: '',
+                            isBold: false,
+                            isItalic: false,
+                            color: '#000000',
+                            fontSize: '14',
+                            align: 'left'
+                        };
+                        
+                        rowData.push(cell);
+                        
+                        input.addEventListener('focus', () => handleCellFocus(row, col));
+                        input.addEventListener('input', (e) => handleCellInput(e, row, col));
+                        
+                        td.appendChild(input);
+                        tr.appendChild(td);
+                    }
+                    
+                    spreadsheet.push(rowData);
+                    spreadsheetEl.appendChild(tr);
+                }
+                
+                // Выделяем первую ячейку по умолчанию
+                selectCell(0, 0);
+            }
+            
+            // Обработчик фокуса на ячейке
+            function handleCellFocus(row, col) {
+                selectCell(row, col);
+            }
+            
+            // Обработчик ввода в ячейку
+            function handleCellInput(e, row, col) {
+                const value = e.target.value;
+                
+                // Если начинается с '=', то это формула
+                if (value.startsWith('=')) {
+                    spreadsheet[row][col].formula = value;
+                    // В реальном редакторе здесь было бы вычисление формулы
+                    spreadsheet[row][col].value = value;
+                } else {
+                    spreadsheet[row][col].value = value;
+                    spreadsheet[row][col].formula = '';
+                }
+                
+                updateCellDisplay(row, col);
+            }
+            
+            // Выделение ячейки
+            function selectCell(row, col) {
+                // Снимаем выделение с предыдущей ячейки
+                const prevSelected = spreadsheetEl.querySelector('.selected');
+                if (prevSelected) prevSelected.classList.remove('selected');
+                
+                // Выделяем новую ячейку
+                const cells = spreadsheetEl.querySelectorAll('td');
+                const cellIndex = row * COLS + col;
+                cells[cellIndex].classList.add('selected');
+                
+                // Обновляем информацию о активной ячейке
+                selectedCell = { row, col };
+                activeCellInfoEl.textContent = `${String.fromCharCode(65 + col)}${row + 1}`;
+                
+                // Заполняем поле ввода формулы
+                const cell = spreadsheet[row][col];
+                formulaInputEl.value = cell.formula || cell.value;
+                
+                // Обновляем состояние кнопок форматирования
+                updateToolbarButtons(cell);
+            }
+            
+            // Обновление отображения ячейки
+            function updateCellDisplay(row, col) {
+                const cells = spreadsheetEl.querySelectorAll('td');
+                const cellIndex = row * COLS + col;
+                const cellEl = cells[cellIndex];
+                const input = cellEl.querySelector('input');
+                const cell = spreadsheet[row][col];
+                
+                // Применяем стили
+                input.style.fontWeight = cell.isBold ? 'bold' : 'normal';
+                input.style.fontStyle = cell.isItalic ? 'italic' : 'normal';
+                input.style.color = cell.color;
+                input.style.fontSize = cell.fontSize + 'px';
+                input.style.textAlign = cell.align;
+            }
+            
+            // Обновление кнопок панели инструментов
+            function updateToolbarButtons(cell) {
+                boldBtnEl.style.fontWeight = cell.isBold ? 'bold' : 'normal';
+                italicBtnEl.style.fontStyle = cell.isItalic ? 'italic' : 'normal';
+                colorBtnEl.style.color = cell.color;
+                fontSizeEl.value = cell.fontSize;
+                
+                // Сбрасываем выделение всех кнопок выравнивания
+                alignLeftBtnEl.style.backgroundColor = 'white';
+                alignCenterBtnEl.style.backgroundColor = 'white';
+                alignRightBtnEl.style.backgroundColor = 'white';
+                
+                // Выделяем активную кнопку выравнивания
+                if (cell.align === 'left') alignLeftBtnEl.style.backgroundColor = '#e3f2fd';
+                else if (cell.align === 'center') alignCenterBtnEl.style.backgroundColor = '#e3f2fd';
+                else if (cell.align === 'right') alignRightBtnEl.style.backgroundColor = '#e3f2fd';
+            }
+            
+            // Загрузка задания
+            function loadTask(taskIndex) {
+                if (taskIndex >= tasks.length) {
+                    // Все задания выполнены
+                    taskTitleEl.textContent = "Тренажёр завершён!";
+                    taskDescriptionEl.textContent = "Поздравляем! Вы успешно выполнили все задания.";
+                    spreadsheetEl.style.display = 'none';
+                    document.querySelector('.formula-bar').style.display = 'none';
+                    document.querySelector('.toolbar').style.display = 'none';
+                    checkBtnEl.style.display = 'none';
+                    hintBtnEl.style.display = 'none';
+                    nextBtnEl.textContent = 'Начать заново';
+                    nextBtnEl.disabled = false;
+                    return;
+                }
+                
+                currentTask = taskIndex;
+                const task = tasks[taskIndex];
+                
+                // Обновляем UI
+                taskTitleEl.textContent = task.title;
+                taskDescriptionEl.textContent = task.getDescription();
+                progressBarEl.style.width = `${(currentTask + 1) / tasks.length * 100}%`;
+                progressTextEl.textContent = `${currentTask + 1}/${tasks.length}`;
+                feedbackEl.style.display = 'none';
+                nextBtnEl.disabled = true;
+                
+                // Сбрасываем таблицу
+                initSpreadsheet();
+            }
+            
+            // Проверка задания
+            function checkTask() {
+                const task = tasks[currentTask];
+                const isCorrect = task.check(spreadsheet);
+                
+                if (isCorrect) {
+                    feedbackEl.textContent = "Правильно! Задание выполнено успешно.";
+                    feedbackEl.className = "feedback success";
+                    nextBtnEl.disabled = false;
+                } else {
+                    feedbackEl.textContent = "Неверно. Попробуйте ещё раз или воспользуйтесь подсказкой.";
+                    feedbackEl.className = "feedback error";
+                }
+                
+                feedbackEl.style.display = 'block';
+            }
+            
+            // Переход к следующему заданию
+            function nextTask() {
+                if (currentTask >= tasks.length - 1 && nextBtnEl.textContent === 'Начать заново') {
+                    // Перезапуск тренажёра
+                    location.reload();
+                } else {
+                    loadTask(currentTask + 1);
+                }
+            }
+            
+            // Показ подсказки
+            function showHint() {
+                hintTextEl.textContent = tasks[currentTask].getHint();
+                hintModalEl.style.display = 'block';
+            }
+            
+            // Закрытие модального окна
+            function closeModal() {
+                hintModalEl.style.display = 'none';
+            }
+            
+            // Обработчики событий
+            formulaInputEl.addEventListener('input', function() {
+                const { row, col } = selectedCell;
+                const value = formulaInputEl.value;
+                
+                if (value.startsWith('=')) {
+                    spreadsheet[row][col].formula = value;
+                    spreadsheet[row][col].value = value; // В реальном редакторе здесь было бы вычисление
+                } else {
+                    spreadsheet[row][col].value = value;
+                    spreadsheet[row][col].formula = '';
+                }
+                
+                const cellEl = spreadsheetEl.querySelectorAll('td')[row * COLS + col];
+                cellEl.querySelector('input').value = value;
+            });
+            
+            // Обработчики панели инструментов
+            boldBtnEl.addEventListener('click', function() {
+                const { row, col } = selectedCell;
+                spreadsheet[row][col].isBold = !spreadsheet[row][col].isBold;
+                updateCellDisplay(row, col);
+                updateToolbarButtons(spreadsheet[row][col]);
+            });
+            
+            italicBtnEl.addEventListener('click', function() {
+                const { row, col } = selectedCell;
+                spreadsheet[row][col].isItalic = !spreadsheet[row][col].isItalic;
+                updateCellDisplay(row, col);
+                updateToolbarButtons(spreadsheet[row][col]);
+            });
+            
+            colorBtnEl.addEventListener('click', function() {
+                colorPickerEl.click();
+            });
+            
+            colorPickerEl.addEventListener('input', function() {
+                const { row, col } = selectedCell;
+                spreadsheet[row][col].color = colorPickerEl.value;
+                updateCellDisplay(row, col);
+                updateToolbarButtons(spreadsheet[row][col]);
+            });
+            
+            fontSizeEl.addEventListener('change', function() {
+                const { row, col } = selectedCell;
+                spreadsheet[row][col].fontSize = fontSizeEl.value;
+                updateCellDisplay(row, col);
+            });
+            
+            alignLeftBtnEl.addEventListener('click', function() {
+                const { row, col } = selectedCell;
+                spreadsheet[row][col].align = 'left';
+                updateCellDisplay(row, col);
+                updateToolbarButtons(spreadsheet[row][col]);
+            });
+            
+            alignCenterBtnEl.addEventListener('click', function() {
+                const { row, col } = selectedCell;
+                spreadsheet[row][col].align = 'center';
+                updateCellDisplay(row, col);
+                updateToolbarButtons(spreadsheet[row][col]);
+            });
+            
+            alignRightBtnEl.addEventListener('click', function() {
+                const { row, col } = selectedCell;
+                spreadsheet[row][col].align = 'right';
+                updateCellDisplay(row, col);
+                updateToolbarButtons(spreadsheet[row][col]);
+            });
+            
+            // Кнопки управления
+            hintBtnEl.addEventListener('click', showHint);
+            checkBtnEl.addEventListener('click', checkTask);
+            nextBtnEl.addEventListener('click', nextTask);
+            closeModalEl.addEventListener('click', closeModal);
+            window.addEventListener('click', function(event) {
+                if (event.target === hintModalEl) {
+                    closeModal();
+                }
+            });
+            
+            // Запуск тренажёра
+            loadTask(0);
+        });
+    </script>
+</body>
+</html>
