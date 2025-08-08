@@ -300,6 +300,33 @@
                 width: 100%;
             }
         }
+
+        /* Кнопка домой */
+        .home-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #bb86fc;
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .home-btn:hover {
+            background-color: #ffeb3b;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -357,6 +384,8 @@
             </div>
         </main>
     </div>
+    
+    <button class="home-btn" id="home-btn" title="На главную">⌂</button>
     
     <div id="hintModal" class="modal">
         <div class="modal-content">
@@ -642,6 +671,7 @@
             const hintModalEl = document.getElementById('hintModal');
             const hintTextEl = document.getElementById('hintText');
             const closeModalEl = document.querySelector('.close');
+            const homeBtnEl = document.getElementById('home-btn');
             
             // Элементы панели инструментов
             const boldBtnEl = document.getElementById('boldBtn');
@@ -934,6 +964,9 @@
             checkBtnEl.addEventListener('click', checkTask);
             nextBtnEl.addEventListener('click', nextTask);
             closeModalEl.addEventListener('click', closeModal);
+            homeBtnEl.addEventListener('click', function() {
+                window.location.href = 'index.html'; // Замените на нужный URL главной страницы
+            });
             window.addEventListener('click', function(event) {
                 if (event.target === hintModalEl) {
                     closeModal();
